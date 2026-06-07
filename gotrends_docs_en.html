@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoTrends — AI Tools Platform Docs</title>
+<meta property="og:title" content="GoTrends — AI Tools Platform for producers and experts">
+<meta property="og:description" content="Technical documentation: 5 AI tools, skyscraper UX, Osiris 3D assistant, n8n + Supabase + GPT-4o">
+<meta property="og:type" content="website">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Unbounded:wght@400;700;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #06090f;
+    --bg2:     #090d17;
+    --card:    #0d1220;
+    --card2:   #111828;
+    --accent:  #4f8ef7;
+    --acc2:    #7c3aed;
+    --gold:    #c9a84c;
+    --gold2:   #f59e0b;
+    --green:   #10b981;
+    --teal:    #2dd4bf;
+    --pink:    #fb7185;
+    --orange:  #f97316;
+    --red:     #ef4444;
+    --border:  rgba(201,168,76,0.12);
+    --border2: rgba(255,255,255,0.05);
+    --text:    #e2e8f0;
+    --muted:   #64748b;
+    --muted2:  #94a3b8;
+    --mono:    'JetBrains Mono', monospace;
+    --head:    'Unbounded', sans-serif;
+    --body:    'Manrope', sans-serif;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{ background:var(--bg); color:var(--text); font-family:var(--body); overflow-x:hidden; }
+
+  @keyframes fadeUp    { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes pulse     { 0%,100%{opacity:1} 50%{opacity:.2} }
+  @keyframes gradShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  @keyframes scanline  { 0%{transform:translateY(-100%)} 100%{transform:translateY(110vh)} }
+  @keyframes float     { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+  @keyframes ticker    { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+  @keyframes goldPulse { 0%,100%{opacity:.6; filter:drop-shadow(0 0 4px rgba(201,168,76,.4))} 50%{opacity:1; filter:drop-shadow(0 0 12px rgba(201,168,76,.8))} }
+  @keyframes spin      { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  @keyframes blink     { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+
+  .fade-up{animation:fadeUp .8s ease both}
+  .d1{animation-delay:.06s} .d2{animation-delay:.18s}
+  .d3{animation-delay:.32s} .d4{animation-delay:.48s} .d5{animation-delay:.64s}
+
+  /* ── NAV ── */
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(6,9,15,.92); backdrop-filter:blur(24px);
+    border-bottom:1px solid var(--border);
+    padding:0 48px; height:58px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .nav-logo{font-family:var(--mono); font-size:12px; font-weight:700; color:var(--gold); letter-spacing:.1em; display:flex; align-items:center; gap:8px;}
+  .nav-dot{width:7px; height:7px; border-radius:50%; background:var(--green); animation:pulse 2s infinite; flex-shrink:0;}
+  .nav-links{display:flex; gap:24px;}
+  .nav-links a{font-family:var(--mono); font-size:11px; color:var(--muted); text-decoration:none; letter-spacing:.06em; transition:color .2s; text-transform:uppercase;}
+  .nav-links a:hover{color:var(--gold);}
+  @media(max-width:720px){nav{padding:0 20px;} .nav-links{display:none;}}
+
+  /* ── LAYOUT ── */
+  section{padding:100px 48px; border-bottom:1px solid var(--border2);}
+  @media(max-width:720px){section{padding:64px 20px;}}
+  .container{max-width:1120px; margin:0 auto;}
+  .sec-label{font-family:var(--mono); font-size:11px; letter-spacing:.13em; color:var(--gold); text-transform:uppercase; margin-bottom:10px;}
+  .sec-title{font-family:var(--head); font-size:clamp(22px,3.2vw,34px); font-weight:700; margin-bottom:10px; line-height:1.15;}
+  .sec-sub{color:var(--muted2); font-size:15px; line-height:1.7; max-width:700px; margin-bottom:52px;}
+
+  /* ── TICKER ── */
+  .ticker-wrap{overflow:hidden; background:rgba(201,168,76,.05); border-top:1px solid rgba(201,168,76,.12); border-bottom:1px solid rgba(201,168,76,.12); padding:10px 0; white-space:nowrap;}
+  .ticker-inner{display:inline-flex; animation:ticker 35s linear infinite;}
+  .ticker-item{font-family:var(--mono); font-size:11px; color:var(--muted); padding:0 40px; letter-spacing:.05em;}
+  .ticker-item span{color:var(--gold); margin-right:8px;}
+
+  /* ── HERO ── */
+  #hero{
+    min-height:100vh; display:flex; flex-direction:column; justify-content:center;
+    position:relative; overflow:hidden; padding-top:58px;
+    border-bottom:1px solid var(--border2);
+  }
+  .hero-bg{
+    position:absolute; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 70% 55% at 85% -5%, rgba(201,168,76,.1) 0%, transparent 60%),
+      radial-gradient(ellipse 55% 45% at 0% 100%, rgba(79,142,247,.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 35% at 50% 50%, rgba(124,58,237,.05) 0%, transparent 70%);
+  }
+  .hero-grid{
+    position:absolute; inset:0; pointer-events:none;
+    background-image:
+      linear-gradient(rgba(201,168,76,.018) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(201,168,76,.018) 1px,transparent 1px);
+    background-size:64px 64px;
+  }
+  .hero-scanline{
+    position:absolute; left:0; right:0; height:1px;
+    background:linear-gradient(90deg,transparent,rgba(201,168,76,.2),rgba(79,142,247,.15),transparent);
+    animation:scanline 10s linear infinite; pointer-events:none;
+  }
+  .hero-inner{position:relative; z-index:2; max-width:1120px; margin:0 auto; padding:0 48px; width:100%;}
+  @media(max-width:720px){.hero-inner{padding:0 20px;}}
+
+  .hero-badge{
+    display:inline-flex; align-items:center; gap:9px;
+    background:rgba(201,168,76,.09); border:1px solid rgba(201,168,76,.25);
+    border-radius:4px; padding:5px 14px; margin-bottom:32px;
+    font-family:var(--mono); font-size:11px; color:var(--gold); letter-spacing:.1em;
+  }
+  .hero-h1{font-family:var(--head); font-size:clamp(34px,5.8vw,72px); font-weight:900; line-height:1.03; letter-spacing:-.02em; margin-bottom:26px;}
+  .hero-h1 em{font-style:normal; color:var(--gold);}
+  .hero-h1 .acc{font-style:normal; color:var(--accent);}
+  .hero-sub{font-size:clamp(15px,1.7vw,18px); color:var(--muted2); line-height:1.75; max-width:660px; margin-bottom:40px;}
+  .hero-meta{display:flex; gap:10px; flex-wrap:wrap;}
+  .hero-tag{font-family:var(--mono); font-size:11px; padding:5px 13px; border-radius:4px; border:1px solid; letter-spacing:.04em;}
+  .ht-gold {color:var(--gold);   border-color:rgba(201,168,76,.35); background:rgba(201,168,76,.07);}
+  .ht-blue {color:var(--accent); border-color:rgba(79,142,247,.35);  background:rgba(79,142,247,.07);}
+  .ht-green{color:var(--green);  border-color:rgba(16,185,129,.35);  background:rgba(16,185,129,.07);}
+  .ht-teal {color:var(--teal);   border-color:rgba(45,212,191,.35);  background:rgba(45,212,191,.07);}
+  .ht-pur  {color:#a78bfa;       border-color:rgba(167,139,250,.35); background:rgba(167,139,250,.07);}
+  .ht-pink {color:var(--pink);   border-color:rgba(251,113,133,.35); background:rgba(251,113,133,.07);}
+  .ht-orange{color:var(--orange);border-color:rgba(249,115,22,.35);  background:rgba(249,115,22,.07);}
+
+  .hero-scroll{
+    position:absolute; bottom:36px; left:50%; transform:translateX(-50%);
+    font-family:var(--mono); font-size:10px; color:var(--muted); letter-spacing:.1em;
+    display:flex; flex-direction:column; align-items:center; gap:9px;
+    animation:float 3.5s ease-in-out infinite;
+  }
+  .hero-scroll::after{content:''; width:1px; height:36px; background:linear-gradient(var(--muted),transparent);}
+
+  .hero-stats{
+    display:flex; gap:32px; margin-top:52px; padding-top:40px;
+    border-top:1px solid var(--border2); flex-wrap:wrap;
+  }
+  .hstat{display:flex; flex-direction:column; gap:4px;}
+  .hstat-val{font-family:var(--head); font-size:clamp(22px,2.8vw,34px); font-weight:900; color:var(--gold);}
+  .hstat-lbl{font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:.06em;}
+
+  /* ── OVERVIEW ── */
+  .overview-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media(max-width:720px){.overview-grid{grid-template-columns:1fr;}}
+  .ov-card{
+    background:var(--card); border:1px solid var(--border2);
+    border-radius:14px; padding:30px; position:relative; overflow:hidden;
+    transition:border-color .3s, transform .3s; cursor:default;
+  }
+  .ov-card:hover{transform:translateY(-4px);}
+  .ov-card::before{content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:14px 14px 0 0;}
+  .ov-card.c-blue::before  {background:linear-gradient(90deg,var(--accent),var(--teal));}
+  .ov-card.c-gold::before  {background:linear-gradient(90deg,var(--gold),var(--orange));}
+  .ov-card.c-green::before {background:linear-gradient(90deg,var(--green),var(--teal));}
+  .ov-card.c-pur::before   {background:linear-gradient(90deg,var(--acc2),var(--pink));}
+  .ov-card:hover.c-blue  {border-color:rgba(79,142,247,.4);}
+  .ov-card:hover.c-gold  {border-color:rgba(201,168,76,.4);}
+  .ov-card:hover.c-green {border-color:rgba(16,185,129,.4);}
+  .ov-card:hover.c-pur   {border-color:rgba(167,139,250,.4);}
+  .ov-icon{font-size:30px; margin-bottom:16px;}
+  .ov-name{font-family:var(--head); font-size:14px; font-weight:700; margin-bottom:10px; line-height:1.3;}
+  .ov-desc{font-size:13.5px; color:var(--muted2); line-height:1.65;}
+
+  /* ── WOW ── */
+  #wow{background:var(--bg2); padding:64px 48px;}
+  .wow-box{
+    border-radius:20px; padding:60px 52px; position:relative; overflow:hidden;
+    background:var(--card);
+    border:1px solid transparent; background-clip:padding-box;
+  }
+  .wow-box::before{
+    content:''; position:absolute; inset:-2px; border-radius:22px; z-index:-1;
+    background:linear-gradient(135deg,var(--gold),var(--accent),var(--gold2),var(--gold));
+    background-size:300% 300%; animation:gradShift 7s ease infinite;
+  }
+  .wow-label{font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; margin-bottom:18px;}
+  .wow-text{font-family:var(--head); font-size:clamp(24px,4vw,50px); font-weight:900; line-height:1.08;}
+  .wow-text em{font-style:normal; color:var(--gold);}
+  .wow-sub{margin-top:20px; font-size:16px; color:var(--muted2); max-width:600px; line-height:1.65;}
+  .wow-glow{position:absolute; top:-80px; right:-80px; width:380px; height:380px; border-radius:50%; pointer-events:none; background:radial-gradient(circle,rgba(201,168,76,.1) 0%,transparent 70%);}
+
+  /* ── FLOORS SECTION ── */
+  .floors-grid{display:flex; flex-direction:column; gap:16px;}
+  .floor-card{
+    display:grid; grid-template-columns:80px 1fr;
+    background:var(--card); border:1px solid var(--border2);
+    border-radius:14px; overflow:hidden;
+    transition:border-color .25s, transform .25s;
+  }
+  .floor-card:hover{transform:translateX(5px);}
+  .floor-num-col{
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+    padding:28px 0; gap:8px;
+    border-right:1px solid var(--border2);
+  }
+  .floor-badge{
+    font-family:var(--head); font-size:22px; font-weight:900;
+    writing-mode:vertical-rl; letter-spacing:.05em;
+  }
+  .floor-body{padding:28px 32px;}
+  .floor-title{font-family:var(--head); font-size:16px; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:10px;}
+  .floor-subtitle{font-family:var(--mono); font-size:10px; color:var(--muted); letter-spacing:.08em; margin-bottom:12px;}
+  .floor-desc{font-size:13.5px; color:var(--muted2); line-height:1.65; margin-bottom:14px;}
+  .floor-tags{display:flex; gap:6px; flex-wrap:wrap;}
+
+  .fc-01{border-left:3px solid var(--accent);}
+  .fc-01 .floor-badge{color:var(--accent);}
+  .fc-01:hover{border-color:rgba(79,142,247,.4);}
+  .fc-02{border-left:3px solid var(--red);}
+  .fc-02 .floor-badge{color:var(--red);}
+  .fc-02:hover{border-color:rgba(239,68,68,.4);}
+  .fc-03{border-left:3px solid var(--gold);}
+  .fc-03 .floor-badge{color:var(--gold);}
+  .fc-03:hover{border-color:rgba(201,168,76,.4);}
+  .fc-04{border-left:3px solid var(--green);}
+  .fc-04 .floor-badge{color:var(--green);}
+  .fc-04:hover{border-color:rgba(16,185,129,.4);}
+  .fc-05{border-left:3px solid var(--acc2);}
+  .fc-05 .floor-badge{color:#a78bfa);}
+  .fc-05:hover{border-color:rgba(124,58,237,.4);}
+
+  /* ── ARCHITECTURE ── */
+  .arch-flow{display:flex; flex-direction:column; gap:0;}
+  .arch-step{display:grid; grid-template-columns:68px 1fr; gap:0 24px; position:relative;}
+  .arch-left{display:flex; flex-direction:column; align-items:center;}
+  .arch-num{
+    width:56px; height:56px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:13px; font-weight:700;
+    flex-shrink:0; position:relative; z-index:1;
+    transition:transform .25s;
+  }
+  .arch-step:hover .arch-num{transform:scale(1.1);}
+  .arch-line{width:2px; flex:1; min-height:24px; background:linear-gradient(var(--border),transparent);}
+  .arch-step:last-child .arch-line{display:none;}
+  .arch-body{padding-bottom:40px;}
+  .arch-card{
+    background:var(--card); border:1px solid var(--border2);
+    border-radius:12px; padding:24px 28px;
+    transition:border-color .25s, transform .25s;
+  }
+  .arch-card:hover{transform:translateX(5px);}
+  .arch-title{font-weight:700; font-size:15.5px; margin-bottom:8px;}
+  .arch-desc{color:var(--muted2); font-size:13.5px; line-height:1.7;}
+  .arch-hint{
+    display:flex; align-items:flex-start; gap:9px;
+    background:rgba(255,255,255,.035); border-radius:8px;
+    padding:11px 15px; margin-top:14px;
+    font-size:13px; color:var(--muted2); line-height:1.6;
+  }
+  .arch-tags{display:flex; gap:6px; flex-wrap:wrap; margin-top:14px;}
+  .atag{font-family:var(--mono); font-size:10px; padding:3px 10px; border-radius:4px; border:1px solid; letter-spacing:.03em;}
+  .at-gold  {color:var(--gold);   border-color:rgba(201,168,76,.3);  background:rgba(201,168,76,.07);}
+  .at-blue  {color:var(--accent); border-color:rgba(79,142,247,.3);  background:rgba(79,142,247,.07);}
+  .at-green {color:var(--green);  border-color:rgba(16,185,129,.3);  background:rgba(16,185,129,.07);}
+  .at-pur   {color:#a78bfa;       border-color:rgba(167,139,250,.3); background:rgba(167,139,250,.07);}
+  .at-teal  {color:var(--teal);   border-color:rgba(45,212,191,.3);  background:rgba(45,212,191,.07);}
+  .at-pink  {color:var(--pink);   border-color:rgba(251,113,133,.3); background:rgba(251,113,133,.07);}
+  .at-orange{color:var(--orange); border-color:rgba(249,115,22,.3);  background:rgba(249,115,22,.07);}
+  .at-red   {color:var(--red);    border-color:rgba(239,68,68,.3);   background:rgba(239,68,68,.07);}
+
+  .n1{background:rgba(79,142,247,.15);  color:var(--accent);}
+  .n2{background:rgba(201,168,76,.15);  color:var(--gold);}
+  .n3{background:rgba(167,139,250,.15); color:#a78bfa;}
+  .n4{background:rgba(16,185,129,.15);  color:var(--green);}
+  .n5{background:rgba(45,212,191,.15);  color:var(--teal);}
+  .n6{background:rgba(249,115,22,.15);  color:var(--orange);}
+
+  .arch-card.step-blue  {border-left:3px solid var(--accent);}
+  .arch-card.step-gold  {border-left:3px solid var(--gold);}
+  .arch-card.step-pur   {border-left:3px solid #a78bfa;}
+  .arch-card.step-green {border-left:3px solid var(--green);}
+  .arch-card.step-teal  {border-left:3px solid var(--teal);}
+  .arch-card.step-orange{border-left:3px solid var(--orange);}
+
+  /* ── OSIRIS ── */
+  #osiris{background:var(--bg2);}
+  .osiris-grid{display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:start;}
+  @media(max-width:820px){.osiris-grid{grid-template-columns:1fr;}}
+
+  .osiris-states{display:flex; flex-direction:column; gap:10px;}
+  .state-row{
+    display:flex; align-items:flex-start; gap:14px;
+    background:var(--card); border:1px solid var(--border2);
+    border-radius:10px; padding:14px 18px;
+    transition:border-color .25s;
+  }
+  .state-row:hover{border-color:rgba(201,168,76,.35);}
+  .state-icon{font-size:20px; flex-shrink:0; margin-top:1px;}
+  .state-name{font-family:var(--mono); font-size:12px; font-weight:700; color:var(--gold); margin-bottom:4px;}
+  .state-desc{font-size:13px; color:var(--muted2); line-height:1.55;}
+
+  /* Osiris visual mock */
+  .osiris-mock{
+    background:linear-gradient(145deg, #0d1220, #111828);
+    border:1px solid rgba(201,168,76,.2);
+    border-radius:16px; padding:28px; text-align:center;
+    position:relative; overflow:hidden;
+  }
+  .osiris-mock::before{
+    content:''; position:absolute; top:-60px; left:50%; transform:translateX(-50%);
+    width:240px; height:240px; border-radius:50%;
+    background:radial-gradient(circle, rgba(201,168,76,.08) 0%, transparent 70%);
+    pointer-events:none;
+  }
+  .osiris-avatar-wrap{
+    width:120px; height:120px; border-radius:50%; margin:0 auto 16px;
+    background:linear-gradient(145deg, #1a2540, #0f1826);
+    border:2px solid rgba(201,168,76,.3);
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    box-shadow: 0 0 0 8px rgba(201,168,76,.05), 0 0 0 16px rgba(201,168,76,.02);
+    animation:float 4s ease-in-out infinite;
+  }
+  .osiris-eye{animation:goldPulse 3s ease-in-out infinite;}
+  .osiris-status-row{display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:16px;}
+  .osiris-status-dot{width:8px; height:8px; border-radius:50%; background:var(--green); animation:pulse 2s infinite;}
+  .osiris-status-txt{font-family:var(--mono); font-size:11px; color:var(--green); letter-spacing:.1em;}
+  .osiris-name{font-family:var(--head); font-size:20px; font-weight:900; color:var(--gold); margin-bottom:6px;}
+  .osiris-role{font-family:var(--mono); font-size:10px; color:var(--muted); letter-spacing:.08em; margin-bottom:20px;}
+
+  .osiris-chat{text-align:left; display:flex; flex-direction:column; gap:10px;}
+  .ochat-msg{display:flex; flex-direction:column; max-width:88%;}
+  .ochat-msg.bot{align-self:flex-start;}
+  .ochat-msg.usr{align-self:flex-end;}
+  .ochat-bubble{padding:10px 14px; border-radius:12px; font-size:12.5px; line-height:1.55;}
+  .bot .ochat-bubble{background:rgba(79,142,247,.12); border:1px solid rgba(79,142,247,.2); border-bottom-left-radius:3px; color:var(--text);}
+  .usr .ochat-bubble{background:rgba(201,168,76,.1); border:1px solid rgba(201,168,76,.2); border-bottom-right-radius:3px; color:var(--text);}
+  .ochat-time{font-size:9px; color:var(--muted); margin-top:3px; font-family:var(--mono);}
+  .bot .ochat-time{align-self:flex-start;}
+  .usr .ochat-time{align-self:flex-end;}
+
+  /* ── DATA SCHEMA ── */
+  .schema-grid{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  @media(max-width:900px){.schema-grid{grid-template-columns:1fr;}}
+  .schema-card{background:var(--card); border:1px solid var(--border2); border-radius:12px; overflow:hidden;}
+  .schema-head{padding:14px 20px; border-bottom:1px solid var(--border2); font-family:var(--mono); font-size:12px; font-weight:700; display:flex; align-items:center; gap:8px;}
+  .schema-body{padding:4px 0;}
+  .field-row{
+    display:grid; grid-template-columns:170px 1fr 80px;
+    align-items:center; gap:12px;
+    padding:10px 20px; border-bottom:1px solid rgba(255,255,255,.03);
+    font-size:12.5px;
+  }
+  .field-row:last-child{border-bottom:none;}
+  .field-name{font-family:var(--mono); font-size:11px; color:var(--gold);}
+  .field-desc{color:var(--muted2); font-size:12px; line-height:1.45;}
+  .ft-str {font-family:var(--mono); font-size:10px; padding:2px 8px; border-radius:3px; color:var(--accent); border:1px solid rgba(79,142,247,.3); background:rgba(79,142,247,.07);}
+  .ft-dt  {font-family:var(--mono); font-size:10px; padding:2px 8px; border-radius:3px; color:var(--green);  border:1px solid rgba(16,185,129,.3);  background:rgba(16,185,129,.07);}
+  .ft-id  {font-family:var(--mono); font-size:10px; padding:2px 8px; border-radius:3px; color:var(--gold);   border:1px solid rgba(201,168,76,.3);  background:rgba(201,168,76,.07);}
+  .ft-bool{font-family:var(--mono); font-size:10px; padding:2px 8px; border-radius:3px; color:var(--teal);   border:1px solid rgba(45,212,191,.3);  background:rgba(45,212,191,.07);}
+  .ft-json{font-family:var(--mono); font-size:10px; padding:2px 8px; border-radius:3px; color:#a78bfa;        border:1px solid rgba(167,139,250,.3); background:rgba(167,139,250,.07);}
+
+  /* ── DASHBOARD PREVIEW ── */
+  #preview{background:var(--bg2);}
+  .dash-mock{
+    background:#08101c; border:1px solid rgba(201,168,76,.15);
+    border-radius:16px; overflow:hidden;
+    box-shadow:0 32px 72px rgba(0,0,0,.6);
+  }
+  .dash-topbar{
+    background:#0d1525; padding:12px 20px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .dash-title-row{display:flex; align-items:center; gap:10px;}
+  .dash-logo{font-family:var(--head); font-size:13px; font-weight:900; color:var(--gold);}
+  .dash-badge{font-family:var(--mono); font-size:9px; color:var(--muted); letter-spacing:.06em;}
+  .dash-user{font-family:var(--mono); font-size:11px; color:var(--gold); padding:4px 12px; border:1px solid rgba(201,168,76,.3); border-radius:4px;}
+
+  .dash-stat-row{display:grid; grid-template-columns:repeat(4,1fr); gap:0; border-bottom:1px solid rgba(255,255,255,.06);}
+  .dash-stat{
+    padding:20px 24px; border-right:1px solid rgba(255,255,255,.06);
+  }
+  .dash-stat:last-child{border-right:none;}
+  .ds-label{font-family:var(--mono); font-size:9px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px;}
+  .ds-val{font-family:var(--head); font-size:28px; font-weight:900; color:var(--gold);}
+  .ds-date{font-family:var(--mono); font-size:18px; font-weight:900; color:var(--gold);}
+
+  .dash-cards-row{display:grid; grid-template-columns:repeat(3,1fr); gap:0;}
+  .dash-tool-card{
+    padding:24px; border-right:1px solid rgba(255,255,255,.04);
+    border-bottom:1px solid rgba(255,255,255,.04);
+  }
+  .dash-tool-card:nth-child(3n){border-right:none;}
+  .dtc-num{font-family:var(--mono); font-size:10px; color:var(--muted); margin-bottom:4px;}
+  .dtc-tool{font-family:var(--mono); font-size:10px; letter-spacing:.08em; margin-bottom:10px;}
+  .dtc-tool.t1{color:var(--accent);}
+  .dtc-tool.t2{color:var(--red);}
+  .dtc-tool.t3{color:var(--gold);}
+  .dtc-tool.t4{color:var(--green);}
+  .dtc-tool.t5{color:#a78bfa;}
+  .dtc-value{font-weight:700; font-size:15px; margin-bottom:8px; line-height:1.3;}
+  .dtc-sub{font-size:11.5px; color:var(--muted2); line-height:1.5; margin-bottom:12px;}
+  .dtc-footer{display:flex; justify-content:space-between; align-items:center; margin-top:auto;}
+  .dtc-date{font-family:var(--mono); font-size:9px; color:var(--muted);}
+  .dtc-btn{font-family:var(--mono); font-size:9px; color:var(--gold); letter-spacing:.05em; border:1px solid rgba(201,168,76,.3); padding:3px 10px; border-radius:3px;}
+
+  /* ── SETUP ── */
+  .setup-list{display:flex; flex-direction:column; gap:12px;}
+  .setup-item{
+    display:flex; gap:18px; align-items:flex-start;
+    background:var(--card); border:1px solid var(--border2);
+    border-radius:12px; padding:22px 26px;
+    transition:border-color .25s, transform .25s;
+  }
+  .setup-item:hover{border-color:rgba(201,168,76,.35); transform:translateX(5px);}
+  .setup-n{
+    width:34px; height:34px; border-radius:9px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:13px; font-weight:700;
+    background:rgba(201,168,76,.12); color:var(--gold);
+  }
+  .setup-text b{color:var(--text); font-size:14px; display:block; margin-bottom:5px;}
+  .setup-text{color:var(--muted2); font-size:13.5px; line-height:1.6;}
+
+  /* ── RESULTS ── */
+  #results{background:var(--bg2);}
+  .results-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+  @media(max-width:720px){.results-grid{grid-template-columns:1fr;}}
+  .res-card{
+    background:var(--card); border:1px solid var(--border2);
+    border-radius:14px; padding:36px 24px; text-align:center;
+    transition:transform .25s, border-color .25s;
+  }
+  .res-card:hover{transform:translateY(-5px);}
+  .res-card.rc-gold:hover {border-color:rgba(201,168,76,.4);}
+  .res-card.rc-blue:hover {border-color:rgba(79,142,247,.4);}
+  .res-card.rc-green:hover{border-color:rgba(16,185,129,.4);}
+  .res-num{font-family:var(--head); font-size:clamp(36px,5vw,58px); font-weight:900; line-height:1; margin-bottom:12px;}
+  .rc-gold  .res-num{color:var(--gold);}
+  .rc-blue  .res-num{color:var(--accent);}
+  .rc-green .res-num{color:var(--green);}
+  .res-desc{font-size:14px; color:var(--muted2); line-height:1.6;}
+
+  /* ── STACK ── */
+  .stack-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px;}
+  .stack-card{
+    background:var(--card); border:1px solid var(--border2);
+    border-radius:12px; padding:22px 24px;
+    transition:transform .25s, border-color .25s;
+  }
+  .stack-card:hover{transform:translateY(-4px); border-color:rgba(201,168,76,.25);}
+  .stack-icon{font-size:28px; margin-bottom:12px;}
+  .stack-name{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--gold); margin-bottom:4px;}
+  .stack-role{font-size:11px; color:var(--accent); font-family:var(--mono); margin-bottom:8px; letter-spacing:.04em;}
+  .stack-desc{font-size:13px; color:var(--muted2); line-height:1.55;}
+
+  /* ── FOOTER ── */
+  footer{
+    background:#040710; border-top:1px solid var(--border);
+    padding:36px 48px;
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;
+  }
+  @media(max-width:720px){footer{padding:28px 20px;}}
+  .footer-logo{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--gold); display:flex; align-items:center; gap:8px;}
+  .footer-meta{font-family:var(--mono); font-size:11px; color:var(--muted);}
+  .footer-tags{display:flex; gap:7px; flex-wrap:wrap;}
+  .footer-tag{font-family:var(--mono); font-size:10px; padding:3px 10px; border-radius:3px; color:var(--muted); border:1px solid var(--border2); background:rgba(255,255,255,.02);}
+
+  hr{border:none; border-top:1px solid var(--border2);}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><span class="nav-dot"></span>// GOTRENDS — AI PLATFORM DOCS</div>
+  <div class="nav-links">
+    <a href="#overview">Overview</a>
+    <a href="#floors">Floors</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#osiris">Osiris</a>
+    <a href="#data">Data</a>
+    <a href="#preview">Dashboard</a>
+    <a href="#results">Results</a>
+    <a href="#stack">Stack</a>
+  </div>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker-wrap" style="margin-top:58px;">
+  <div class="ticker-inner">
+    <span class="ticker-item"><span>10</span> n8n workflows</span>
+    <span class="ticker-item"><span>5</span> AI tools</span>
+    <span class="ticker-item"><span>1</span> 3D assistant</span>
+    <span class="ticker-item"><span>GPT-4o</span> on every floor</span>
+    <span class="ticker-item"><span>Supabase</span> + pgvector RAG</span>
+    <span class="ticker-item"><span>Apify</span> YouTube · Instagram · TikTok</span>
+    <span class="ticker-item"><span>Tavily</span> web search for trends</span>
+    <span class="ticker-item"><span>Babylon.js</span> 3D Osiris model</span>
+    <span class="ticker-item"><span>Telegram</span> Web App + Bot</span>
+    <span class="ticker-item"><span>10</span> n8n workflows</span>
+    <span class="ticker-item"><span>5</span> AI tools</span>
+    <span class="ticker-item"><span>1</span> 3D assistant</span>
+    <span class="ticker-item"><span>GPT-4o</span> on every floor</span>
+    <span class="ticker-item"><span>Supabase</span> + pgvector RAG</span>
+    <span class="ticker-item"><span>Apify</span> YouTube · Instagram · TikTok</span>
+    <span class="ticker-item"><span>Tavily</span> web search for trends</span>
+    <span class="ticker-item"><span>Babylon.js</span> 3D Osiris model</span>
+    <span class="ticker-item"><span>Telegram</span> Web App + Bot</span>
+  </div>
+</div>
+
+<!-- ══ HERO ══ -->
+<section id="hero" style="padding-top:0; margin-top:0;">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-scanline"></div>
+  <div class="hero-inner" style="padding-top:80px; padding-bottom:100px;">
+    <div class="hero-badge fade-up d1">
+      <span class="nav-dot"></span>
+      // GOTRENDS — AI TOOLS PLATFORM · BETA
+    </div>
+    <h1 class="hero-h1 fade-up d2">Your AI<br>growth<br><em>HQ.</em></h1>
+    <p class="hero-sub fade-up d3">Five powerful AI tools in one place — from a deep analysis of a YouTube channel to a personal 90-day growth strategy. A skyscraper metaphor as the UX: each floor is a separate room with its own atmosphere, the 3D assistant Osiris, and full data synchronization between the tools via Supabase.</p>
+    <div class="hero-meta fade-up d4">
+      <span class="hero-tag ht-blue">n8n · 10 workflows</span>
+      <span class="hero-tag ht-gold">GPT-4o</span>
+      <span class="hero-tag ht-teal">Apify · Tavily</span>
+      <span class="hero-tag ht-green">Supabase + pgvector</span>
+      <span class="hero-tag ht-pur">Babylon.js 3D</span>
+      <span class="hero-tag ht-pink">Telegram Web App</span>
+      <span class="hero-tag ht-orange">HTML/CSS/JS · One File</span>
+    </div>
+    <div class="hero-stats fade-up d5">
+      <div class="hstat">
+        <div class="hstat-val">5</div>
+        <div class="hstat-lbl">AI tools</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val">10</div>
+        <div class="hstat-lbl">n8n workflows</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val">3</div>
+        <div class="hstat-lbl">access channels</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val">1</div>
+        <div class="hstat-lbl">HTML · single frontend file</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scroll fade-up d5">SCROLL</div>
+</section>
+
+<!-- ══ OVERVIEW ══ -->
+<section id="overview">
+  <div class="container">
+    <div class="sec-label">// 01 — OVERVIEW</div>
+    <h2 class="sec-title">What the platform does</h2>
+    <p class="sec-sub">Four areas that together cover the full cycle — from niche research to a concrete action plan for the next 30, 60 or 90 days.</p>
+    <div class="overview-grid">
+      <div class="ov-card c-blue">
+        <div class="ov-icon">📊</div>
+        <div class="ov-name">Channel and competitor analytics</div>
+        <div class="ov-desc">The system scrapes YouTube, Instagram and TikTok on its own via Apify: subscribers, average views, ER, top videos. In parallel — reconnaissance of up to 3 competitors in your niche, surfacing open formats and weak spots.</div>
+      </div>
+      <div class="ov-card c-gold">
+        <div class="ov-icon">💡</div>
+        <div class="ov-name">Idea generation with context</div>
+        <div class="ov-desc">A content plan for 10–30 videos is generated by GPT-4o using the data from the previous floors — channel, competitors, trends. Each idea: title, hook, format (long/Shorts), runtime. Without Supabase context — it generates by niche.</div>
+      </div>
+      <div class="ov-card c-green">
+        <div class="ov-icon">📈</div>
+        <div class="ov-name">Real-time trend analysis</div>
+        <div class="ov-desc">Tavily searches each selected platform in parallel — what's gaining momentum right now, what's already burned out. GPT-4o consolidates the data into three blocks: hot trends, dead topics, and a concrete tip on "what to film right now".</div>
+      </div>
+      <div class="ov-card c-pur">
+        <div class="ov-icon">🚀</div>
+        <div class="ov-name">Growth strategy with full context</div>
+        <div class="ov-desc">The final tool gathers the saved results of all 4 previous floors from Supabase and builds a personal strategy for 30/60/90 days: phases, concrete actions, KPIs with numbers. It works even without prior data — based on your niche and goal.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ WOW BANNER ══ -->
+<section id="wow">
+  <div class="container">
+    <div class="wow-box">
+      <div class="wow-glow"></div>
+      <div class="wow-label">// the key architectural decision</div>
+      <div class="wow-text">Data flows between<br>floors —<br><em>automatically.</em></div>
+      <div class="wow-sub">Every result is stored in Supabase and becomes the context for the next tool. The content plan knows your channel. The strategy knows the trends. Osiris knows everything — and responds exactly in the context of the floor you're on.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FLOORS ══ -->
+<section id="floors">
+  <div class="container">
+    <div class="sec-label">// 02 — FIVE FLOORS</div>
+    <h2 class="sec-title">Tool rooms</h2>
+    <p class="sec-sub">Each floor has its own atmosphere, a unique room design, its own n8n workflow and webhook. A TV in the center, an ON/OFF remote, spotlights — and no superfluous elements.</p>
+    <div class="floors-grid">
+
+      <div class="floor-card fc-01">
+        <div class="floor-num-col">
+          <div class="floor-badge">01</div>
+        </div>
+        <div class="floor-body">
+          <div class="floor-title">📊 Channel analysis</div>
+          <div class="floor-subtitle">ANALYTICS LAB · BLUE-AND-WHITE TONES</div>
+          <div class="floor-desc">You enter a link to a YouTube, Instagram or TikTok channel. The Apify scraper collects the data: subscribers, average views, ER, top videos by views and likes. GPT-4o analyzes the patterns — what drives reach, where retention drops, concrete recommendations. Webhook: <code style="font-family:var(--mono);font-size:11px;color:var(--gold)">/gotrends-floor-01</code></div>
+          <div class="floor-tags">
+            <span class="atag at-blue">Apify YouTube/IG/TikTok</span>
+            <span class="atag at-pur">GPT-4o Analysis</span>
+            <span class="atag at-green">Supabase Save</span>
+            <span class="atag at-gold">Platform Auto-Detect</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="floor-card fc-02">
+        <div class="floor-num-col">
+          <div class="floor-badge">02</div>
+        </div>
+        <div class="floor-body">
+          <div class="floor-title">🔍 Competitor analysis</div>
+          <div class="floor-subtitle">INTELLIGENCE HQ · RED-AND-BLACK PALETTE</div>
+          <div class="floor-desc">Up to 3 competitors (URL or @handle). splitInBatches processes each one sequentially via Apify, a static array accumulates the data. In parallel — Tavily searches for web context. GPT-4o produces a comparison table: strengths/weaknesses, open niches, top formats that hit. Webhook: <code style="font-family:var(--mono);font-size:11px;color:var(--red)">/gotrends-floor-02</code></div>
+          <div class="floor-tags">
+            <span class="atag at-red">Apify + splitInBatches</span>
+            <span class="atag at-teal">Tavily Web Context</span>
+            <span class="atag at-pur">GPT-4o Comparison</span>
+            <span class="atag at-green">Gap Analysis</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="floor-card fc-03">
+        <div class="floor-num-col">
+          <div class="floor-badge">03</div>
+        </div>
+        <div class="floor-body">
+          <div class="floor-title">💡 Content plan</div>
+          <div class="floor-subtitle">CREATIVE STUDIO · GOLD-AND-ORANGE TONES</div>
+          <div class="floor-desc">You describe a niche or topic, choose the number of ideas (10/20/30) and the format (long/Shorts/mix). Before generating, the workflow pulls the latest F1 and F2 results from Supabase — GPT-4o knows your channel and competitors. max_tokens: 3000 guarantees a full set of ideas. Webhook: <code style="font-family:var(--mono);font-size:11px;color:var(--gold)">/gotrends-content-plan</code></div>
+          <div class="floor-tags">
+            <span class="atag at-gold">Supabase Context F1+F2</span>
+            <span class="atag at-pur">GPT-4o · temp 0.85</span>
+            <span class="atag at-blue">10/20/30 ideas</span>
+            <span class="atag at-teal">Long + Shorts</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="floor-card fc-04">
+        <div class="floor-num-col">
+          <div class="floor-badge">04</div>
+        </div>
+        <div class="floor-body">
+          <div class="floor-title">📈 Trend analysis</div>
+          <div class="floor-subtitle">STOCK EXCHANGE TRADING FLOOR · GREEN-AND-BLACK PALETTE</div>
+          <div class="floor-desc">You enter a topic and choose the platforms. splitInBatches launches a Tavily search in parallel for each selected platform. Merge Results consolidates everything into a single block. GPT-4o (temp 0.4, max_tokens 600) returns a strict JSON response: hot[], dead[], tip. Webhook: <code style="font-family:var(--mono);font-size:11px;color:var(--green)">/gotrends-trend-analysis</code></div>
+          <div class="floor-tags">
+            <span class="atag at-teal">Tavily Parallel Search</span>
+            <span class="atag at-green">YouTube + TikTok + IG</span>
+            <span class="atag at-pur">GPT-4o · temp 0.4</span>
+            <span class="atag at-gold">Hot / Dead / Tip</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="floor-card fc-05">
+        <div class="floor-num-col">
+          <div class="floor-badge" style="color:#a78bfa">05</div>
+        </div>
+        <div class="floor-body">
+          <div class="floor-title">🚀 Growth strategy</div>
+          <div class="floor-subtitle">NASA MISSION CONTROL · DARK BLUE + GOLD</div>
+          <div class="floor-desc">You describe your niche, goal and choose the horizon (30/60/90 days). The workflow makes a GET request to Supabase — pulling the latest F1–F4 results (limit=8). Build Context forms a structured text block. GPT-4o builds a strategy with phases and 4 KPIs. If there's no prior data — it builds by niche and goal. Webhook: <code style="font-family:var(--mono);font-size:11px;color:#a78bfa">/gotrends-growth-strategy</code></div>
+          <div class="floor-tags">
+            <span class="atag at-pur">Supabase Context F1–F4</span>
+            <span class="atag at-gold">GPT-4o · max_tokens 2000</span>
+            <span class="atag at-blue">30 / 60 / 90 days</span>
+            <span class="atag at-teal">Phases + KPI</span>
+            <span class="atag at-green">Fallback without context</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ ARCHITECTURE ══ -->
+<section id="architecture">
+  <div class="container">
+    <div class="sec-label">// 03 — ARCHITECTURE</div>
+    <h2 class="sec-title">How it works — the full flow</h2>
+    <p class="sec-sub">From the first request to a saved result in the dashboard. Seven stages, each one a separate module with a clear responsibility.</p>
+
+    <div class="arch-flow">
+
+      <div class="arch-step">
+        <div class="arch-left">
+          <div class="arch-num n1">01</div>
+          <div class="arch-line"></div>
+        </div>
+        <div class="arch-body">
+          <div class="arch-card step-blue">
+            <div class="arch-title">🖥️ Frontend — one HTML file, 5000+ lines</div>
+            <div class="arch-desc">The entire frontend is pure HTML/CSS/JS in a single file. A skyscraper metaphor: the floors are CSS scroll sections, with an elevator animation between them via JS. Each floor has a unique background room, a TV in the center and an ON/OFF remote. When the remote is pressed, spotlights from all 4 corners light up the TV (CSS conic-gradient + spotlight-pulse animation). The tool window "flies out" of the TV. Navigation — a sticky strip at the top with auto-scroll, and up/down arrows between floors. On any transition — user_state.tool is updated in Supabase.</div>
+            <div class="arch-hint">💡 Mobile lock: a CSS media query + a JS overlay "Available on desktop only". Design system: Bebas Neue + Syne + Space Mono, a gold cursor (cursor:none + custom SVG, z-index 999999).</div>
+            <div class="arch-tags">
+              <span class="atag at-blue">Pure HTML/CSS/JS</span>
+              <span class="atag at-gold">CSS Animations</span>
+              <span class="atag at-teal">Scroll Sections</span>
+              <span class="atag at-pur">Babylon.js 3D</span>
+              <span class="atag at-green">Supabase Auth</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-left">
+          <div class="arch-num n2">02</div>
+          <div class="arch-line"></div>
+        </div>
+        <div class="arch-body">
+          <div class="arch-card step-gold">
+            <div class="arch-title">🔐 Authorization — phone + password → Supabase</div>
+            <div class="arch-desc">Custom authorization with no third-party OAuth. The form collects a phone number and password → SHA-256 hash → POST to the Supabase users table. On a successful login, localStorage saves user.id (a real UUID from Supabase). This user_id is the key to every operation: Osiris dialogues, user_state, saved tool_results. UPSERT user_state: a POST with Prefer: resolution=merge-duplicates — both scenarios (new and existing user) through a single request.</div>
+            <div class="arch-hint">💡 A critical fix: the old user_id format (site_abc123_timestamp) generated new records for every session. After the fix — a real UUID from Supabase, one row per user.</div>
+            <div class="arch-tags">
+              <span class="atag at-gold">Supabase users table</span>
+              <span class="atag at-green">SHA-256 password hash</span>
+              <span class="atag at-blue">localStorage UUID</span>
+              <span class="atag at-teal">UPSERT user_state</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-left">
+          <div class="arch-num n3">03</div>
+          <div class="arch-line"></div>
+        </div>
+        <div class="arch-body">
+          <div class="arch-card step-pur">
+            <div class="arch-title">⚡ n8n Webhook — request routing</div>
+            <div class="arch-desc">Each floor has its own webhook endpoint on n8n (self-hosted Hostinger VPS). The standard pattern: Webhook → Validate Input (Code node, throws an error if required fields are missing) → Logic/Scraping → GPT-4o → Parse Response (strips ```json wrappers, returns a fallback if the JSON is invalid) → Respond (200 + Access-Control-Allow-Origin: *). Separate workflows: save-result (/gotrends-save-result) and get-results (/gotrends-get-results).</div>
+            <div class="arch-hint">💡 All webhooks respond with Access-Control-Allow-Origin: * — CORS doesn't block requests from the frontend. responseMode: responseNode gives full control over the response.</div>
+            <div class="arch-tags">
+              <span class="atag at-pur">n8n self-hosted VPS</span>
+              <span class="atag at-blue">POST Webhooks</span>
+              <span class="atag at-gold">Validate → Logic → Respond</span>
+              <span class="atag at-teal">CORS headers</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-left">
+          <div class="arch-num n4">04</div>
+          <div class="arch-line"></div>
+        </div>
+        <div class="arch-body">
+          <div class="arch-card step-green">
+            <div class="arch-title">🔎 Data collection — Apify + Tavily</div>
+            <div class="arch-desc">Floors 1 and 2: Apify actors for YouTube Data Scraper, Instagram Profile Scraper, TikTok Profile Scraper. Floor 2 — splitInBatches processes the competitors sequentially, saving to a static array (not a Code-Merge that wipes the data). Floors 2 and 4: Tavily with search_depth: advanced, max_results: 6, include_answer: true. Floor 4 — Split Platforms → a parallel Tavily for each platform → Merge Results into a single text block.</div>
+            <div class="arch-hint">💡 Platform auto-detection by URL: youtube.com → YouTube Apify actor, instagram.com → IG actor, tiktok.com → TikTok actor. Both a URL and an @handle are supported.</div>
+            <div class="arch-tags">
+              <span class="atag at-green">Apify YouTube/IG/TikTok</span>
+              <span class="atag at-teal">Tavily Advanced Search</span>
+              <span class="atag at-gold">splitInBatches Loop</span>
+              <span class="atag at-blue">Parallel Requests</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-left">
+          <div class="arch-num n5">05</div>
+          <div class="arch-line"></div>
+        </div>
+        <div class="arch-body">
+          <div class="arch-card step-teal">
+            <div class="arch-title">🧠 GPT-4o — analysis and generation</div>
+            <div class="arch-desc">Each floor has its own system prompt and JSON response schema. Floor 3 (content plan): temperature 0.85, max_tokens 3000. Floor 4 (trends): temperature 0.4, max_tokens 600 — a strict structure. Floor 5 (strategy): temperature 0.7, max_tokens 2000, a context block with F1–F4 data. Osiris AI Agent: GPT-4o via the n8n AI Agent node with RAG (match_documents, pgvector) + direct reading of tool_results (MAX_TOOL_CHARS: 3000, MAX_HISTORY_CHARS: 2000).</div>
+            <div class="arch-hint">💡 All prompts require "ONLY valid JSON with no text before or after". Parse Response always strips ```json wrappers and has a try/catch with a fallback object.</div>
+            <div class="arch-tags">
+              <span class="atag at-pur">GPT-4o</span>
+              <span class="atag at-gold">JSON-only responses</span>
+              <span class="atag at-teal">RAG pgvector</span>
+              <span class="atag at-blue">Context Injection</span>
+              <span class="atag at-green">Fallback Parsing</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-left">
+          <div class="arch-num n6">06</div>
+          <div class="arch-line"></div>
+        </div>
+        <div class="arch-body">
+          <div class="arch-card step-orange">
+            <div class="arch-title">💾 Saving results — tool_results → Dashboard</div>
+            <div class="arch-desc">After receiving a result, the user clicks "Save". The frontend sends a POST to /gotrends-save-result: {user_id, tool, platform, result}. The workflow validates it (an allowedTools list), builds the payload → POST to the Supabase tool_results table with Prefer: return=representation. The dashboard (/gotrends-get-results) loads all of the user's records, groups them by tool (taking the latest + history with a preview), and returns data + history objects. showFNResult → lupa-modal → saveBtn — the standard pattern on every floor.</div>
+            <div class="arch-hint">💡 tool_results.result is a JSONB field. Each tool stores its own schema. The get-results preview line pulls a key field depending on the tool: channel_analysis → channel.name, content_plan → ideas.length + niche, and so on.</div>
+            <div class="arch-tags">
+              <span class="atag at-orange">tool_results JSONB</span>
+              <span class="atag at-green">Supabase POST + UPSERT</span>
+              <span class="atag at-gold">showFNResult pattern</span>
+              <span class="atag at-blue">Dashboard Preview</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-left">
+          <div class="arch-num n1">07</div>
+        </div>
+        <div class="arch-body">
+          <div class="arch-card step-blue">
+            <div class="arch-title">📱 Telegram — Bot + Web App + Osiris Page</div>
+            <div class="arch-desc">Osiris Telegram Bot workflow: /start → sendPhoto → Wait (3s) → editMessageMedia (GIF + welcome + 3 menu buttons) via HTTP Request (not the native TG node — it doesn't support editMessageMedia). 3 buttons: open the website, launch the Web App, activate Osiris. Web App: the same osiris-webapp.html on the Hostinger VPS, transparent background, Osiris expanded right away, user_id = Telegram.WebApp.initDataUnsafe.user.id. Deploy: locally → push to GitHub → curl the raw URL onto the VPS. The 5 tool buttons set user_state.tool in Supabase.</div>
+            <div class="arch-hint">💡 HTTP Request instead of the Telegram node for editMessageMedia — a critical detail. The IF node in n8n: ={{ $json.id }} with is empty (not $json[0]?.id — n8n auto-unwraps arrays).</div>
+            <div class="arch-tags">
+              <span class="atag at-blue">Telegram Bot API</span>
+              <span class="atag at-pur">Web App (Mini App)</span>
+              <span class="atag at-gold">editMessageMedia</span>
+              <span class="atag at-teal">user_state.tool</span>
+              <span class="atag at-green">GitHub → VPS Deploy</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ OSIRIS ══ -->
+<section id="osiris">
+  <div class="container">
+    <div class="sec-label">// 04 — OSIRIS AI</div>
+    <h2 class="sec-title">The platform's 3D assistant</h2>
+    <p class="sec-sub">Osiris is the brand's third hero. A smart machine with an Egyptian Eye logo, a Babylon.js 3D model and a GPT-4o brain. Present on every floor and aware of the context the user is in.</p>
+
+    <div class="osiris-grid">
+      <div class="osiris-states">
+        <div class="state-row">
+          <div class="state-icon">😴</div>
+          <div>
+            <div class="state-name">COLLAPSED</div>
+            <div class="state-desc">Only the Eye avatar is visible (an Egyptian SVG with a gold pulse animation). The indicator button is red. Takes up minimal space in the corner of the screen.</div>
+          </div>
+        </div>
+        <div class="state-row">
+          <div class="state-icon">🔄</div>
+          <div>
+            <div class="state-name">EXPANDED — INACTIVE</div>
+            <div class="state-desc">The base.glb 3D model — a constant slow rotation (spin). Waiting for activation. The ACTIVATE button is visible. Babylon.js renders the GLB from GitHub Pages (bogdangodluk22-art/osiris-assets).</div>
+          </div>
+        </div>
+        <div class="state-row">
+          <div class="state-icon">🟢</div>
+          <div>
+            <div class="state-name">ACTIVE</div>
+            <div class="state-desc">Switches to breathing.glb (a breathing idle animation). A dialogue window appears with parseMarkdown() — rendering Markdown via innerHTML. The button turns green. Webhook payload: {message, source: 'site'|'webapp', phone: userId}.</div>
+          </div>
+        </div>
+        <div class="state-row">
+          <div class="state-icon">⌨️</div>
+          <div>
+            <div class="state-name">TYPING</div>
+            <div class="state-desc">While generating a response — switches to touch.glb (typing animation). Returns to breathing.glb after receiving the response from n8n.</div>
+          </div>
+        </div>
+        <div class="state-row">
+          <div class="state-icon">🔴</div>
+          <div>
+            <div class="state-name">DEACTIVATED</div>
+            <div class="state-desc">Returns to base.glb (spin). The button is red again. The tool in Supabase is reset to fallback or the floor's previous state.</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="osiris-mock">
+          <div class="osiris-avatar-wrap">
+            <svg class="osiris-eye" width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Egyptian Eye of Osiris -->
+              <ellipse cx="32" cy="32" rx="24" ry="14" stroke="#c9a84c" stroke-width="2" fill="none"/>
+              <circle cx="32" cy="32" r="9" fill="#c9a84c" opacity="0.9"/>
+              <circle cx="32" cy="32" r="5" fill="#06090f"/>
+              <circle cx="34" cy="30" r="1.5" fill="#c9a84c" opacity="0.7"/>
+              <!-- Eye lashes top -->
+              <line x1="32" y1="18" x2="32" y2="13" stroke="#c9a84c" stroke-width="1.5"/>
+              <line x1="22" y1="21" x2="19" y2="17" stroke="#c9a84c" stroke-width="1.5"/>
+              <line x1="42" y1="21" x2="45" y2="17" stroke="#c9a84c" stroke-width="1.5"/>
+              <!-- Tears bottom -->
+              <path d="M32 46 L28 54 L32 50 L36 54 Z" fill="#c9a84c" opacity="0.6"/>
+            </svg>
+          </div>
+          <div class="osiris-status-row">
+            <div class="osiris-status-dot"></div>
+            <div class="osiris-status-txt">OSIRIS · ONLINE</div>
+          </div>
+          <div class="osiris-name">OSIRIS</div>
+          <div class="osiris-role">// AI ASSISTANT · GoTrends Platform</div>
+
+          <div class="osiris-chat">
+            <div class="ochat-msg bot">
+              <div class="ochat-bubble">Hi! I see you're on Floor 3 — Content plan. Want me to help generate ideas or explain how to use the data from the channel analysis?</div>
+              <div class="ochat-time">Osiris · 14:22</div>
+            </div>
+            <div class="ochat-msg usr">
+              <div class="ochat-bubble">How do I factor in the competitor results during generation?</div>
+              <div class="ochat-time">You · 14:23</div>
+            </div>
+            <div class="ochat-msg bot">
+              <div class="ochat-bubble">If you've already saved the Floor 2 results — click "Save" after the analysis — they'll automatically be added to the context. The system will pull the <strong>open niches</strong> and the competitors' top formats, and GPT will take that into account when generating ideas.</div>
+              <div class="ochat-time">Osiris · 14:23</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px; background:var(--card); border:1px solid var(--border2); border-radius:12px; padding:20px 24px;">
+          <div class="sec-label" style="margin-bottom:12px;">// n8n WORKFLOW — OSIRIS AI</div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="display:flex; gap:8px; align-items:center; font-size:12.5px; color:var(--muted2);">
+              <span class="atag at-blue" style="flex-shrink:0">01</span> Webhook → parse {message, source, phone}
+            </div>
+            <div style="display:flex; gap:8px; align-items:center; font-size:12.5px; color:var(--muted2);">
+              <span class="atag at-gold" style="flex-shrink:0">02</span> Find/Create User (Postgres GET → INSERT)
+            </div>
+            <div style="display:flex; gap:8px; align-items:center; font-size:12.5px; color:var(--muted2);">
+              <span class="atag at-teal" style="flex-shrink:0">03</span> Upsert user_state (source + tool)
+            </div>
+            <div style="display:flex; gap:8px; align-items:center; font-size:12.5px; color:var(--muted2);">
+              <span class="atag at-pur" style="flex-shrink:0">04</span> Get Dialog History (last N messages)
+            </div>
+            <div style="display:flex; gap:8px; align-items:center; font-size:12.5px; color:var(--muted2);">
+              <span class="atag at-green" style="flex-shrink:0">05</span> Code Prepare → inject tool_results context (3000 chars) + history (2000 chars)
+            </div>
+            <div style="display:flex; gap:8px; align-items:center; font-size:12.5px; color:var(--muted2);">
+              <span class="atag at-pur" style="flex-shrink:0">06</span> AI Agent (GPT-4o + RAG match_documents)
+            </div>
+            <div style="display:flex; gap:8px; align-items:center; font-size:12.5px; color:var(--muted2);">
+              <span class="atag at-gold" style="flex-shrink:0">07</span> Extract Reply → Save History → Respond
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ DATA SCHEMA ══ -->
+<section id="data">
+  <div class="container">
+    <div class="sec-label">// 05 — DATA SCHEMA</div>
+    <h2 class="sec-title">What is stored in Supabase</h2>
+    <p class="sec-sub">Supabase project: kkygebjnycsdlugfqmff. Four tables — full synchronization between the website, Telegram and Osiris. pgvector for the RAG knowledge base.</p>
+    <div class="schema-grid">
+
+      <div class="schema-card">
+        <div class="schema-head" style="color:var(--accent);">👤 users</div>
+        <div class="schema-body">
+          <div class="field-row">
+            <div class="field-name">id</div>
+            <div class="field-desc">UUID — the user's primary key across the whole system</div>
+            <span class="ft-id">UUID PK</span>
+          </div>
+          <div class="field-row">
+            <div class="field-name">phone</div>
+            <div class="field-desc">Phone number — login to the platform</div>
+            <span class="ft-str">TEXT UNIQUE</span>
+          </div>
+          <div class="field-row">
+            <div class="field-name">password_hash</div>
+            <div class="field-desc">SHA-256 password hash</div>
+            <span class="ft-str">TEXT</span>
+          </div>
+          <div class="field-row">
+            <div class="field-name">telegram_chat_id</div>
+            <div class="field-desc">Telegram ID — link to the bot</div>
+            <span class="ft-str">TEXT UNIQUE</span>
+          </div>
+          <div class="field-row">
+            <div class="field-name">created_at</div>
+            <div class="field-desc">Registration date</div>
+            <span class="ft-dt">TIMESTAMPTZ</span>
+          </div>
+          <div class="field-row">
+            <div class="field-name">last_seen</div>
+            <div class="field-desc">Last activity</div>
+            <span class="ft-dt">TIMESTAMPTZ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="schema-card">
+        <div class="schema-head" style="color:var(--green);">🎛️ user_state</div>
+        <div class="schema-body">
+          <div class="field-row">
+            <div class="field-name">user_id</div>
+            <div class="field-desc">Reference to users.id — who this is</div>
+            <span class="ft-id">UUID PK → users</span>
+          </div>
+          <div class="field-row">
+            <div class="field-name">source</div>
+            <div class="field-desc">Channel: 'site' or 'webapp'</div>
+            <span class="ft-str">TEXT</span>
+          </div>
+          <div class="field-row">
+            <div class="field-name">tool</div>
+            <div class="field-desc">Current context: fallback / osiris / channel_analysis / competitor_analysis / content_plan / trend_analysis / growth_strategy</div>
+            <span class="ft-str">TEXT</span>
+          </div>
+          <div class="field-row">
+            <div class="field-name">updated_at</div>
+            <div class="field-desc">When the state was last updated</div>
+            <span class="ft-dt">TIMESTAMPTZ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="schema-card">
+        <div class="schema-head" style="color:var(--gold);">💬 dialog_history</div>
+        <div class="schema-body">
+          <div class="field-row">
+            <div class="field-name">id</div>
+            <div class="field-desc">Unique message ID</div>
+            <span class="ft-id">UUID PK</span>
+          </div>
+          <div class="field-row">
+            <div class="field-name">user_id</div>
+            <div class="field-desc">Reference to the user</div>
+            <span class="ft-id">UUID → users</span>
+          </div>
+          <div class="field-row">
+            <div class="field-name">role</div>
+            <div class="field-desc">'user' or 'assistant'</div>
+            <span class="ft-str">TEXT</span>
+          </div>
+          <div class="field-row">
+            <div class="field-name">content</div>
+            <div class="field-desc">Message text (trimmed to MAX_HISTORY_CHARS: 2000)</div>
+            <span class="ft-str">TEXT</span>
+          </div>
+          <div class="field-row">
+            <div class="field-name">source</div>
+            <div class="field-desc">Where it came from: 'site' or 'webapp'</div>
+            <span class="ft-str">TEXT</span>
+          </div>
+          <div class="field-row">
+            <div class="field-name">created_at</div>
+            <div class="field-desc">Message time</div>
+            <span class="ft-dt">TIMESTAMPTZ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="schema-card">
+        <div class="schema-head" style="color:#a78bfa;">💾 tool_results</div>
+        <div class="schema-body">
+          <div class="field-row">
+            <div class="field-name">id</div>
+            <div class="field-desc">Unique ID of the saved result</div>
+            <span class="ft-id">UUID PK</span>
+          </div>
+          <div class="field-row">
+            <div class="field-name">user_id</div>
+            <div class="field-desc">Reference to the user</div>
+            <span class="ft-id">UUID → users</span>
+          </div>
+          <div class="field-row">
+            <div class="field-name">tool</div>
+            <div class="field-desc">Which tool: channel_analysis, competitor_analysis, content_plan, trend_analysis, growth_strategy</div>
+            <span class="ft-str">TEXT</span>
+          </div>
+          <div class="field-row">
+            <div class="field-name">platform</div>
+            <div class="field-desc">Analysis platform (youtube/instagram/tiktok or null)</div>
+            <span class="ft-str">TEXT NULL</span>
+          </div>
+          <div class="field-row">
+            <div class="field-name">result</div>
+            <div class="field-desc">The full JSON response from GPT-4o — a unique structure for each tool</div>
+            <span class="ft-json">JSONB</span>
+          </div>
+          <div class="field-row">
+            <div class="field-name">created_at</div>
+            <div class="field-desc">Save time</div>
+            <span class="ft-dt">TIMESTAMPTZ</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- documents table separate -->
+    <div style="margin-top:20px;" class="schema-card">
+      <div class="schema-head" style="color:var(--teal);">🧠 documents — Osiris's RAG knowledge base</div>
+      <div class="schema-body" style="display:grid; grid-template-columns:1fr 1fr;">
+        <div class="field-row">
+          <div class="field-name">id</div>
+          <div class="field-desc">Chunk auto-increment</div>
+          <span class="ft-id">BIGINT PK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-name">content</div>
+          <div class="field-desc">Chunk text (500 characters, overlap 50)</div>
+          <span class="ft-str">TEXT</span>
+        </div>
+        <div class="field-row">
+          <div class="field-name">metadata</div>
+          <div class="field-desc">source: GoTrends_Knowledge_Base, version: 1.0, file_id</div>
+          <span class="ft-json">JSONB</span>
+        </div>
+        <div class="field-row">
+          <div class="field-name">embedding</div>
+          <div class="field-desc">OpenAI text-embedding-ada-002 vector (1536 dimensions)</div>
+          <span class="ft-bool">VECTOR(1536)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ DASHBOARD PREVIEW ══ -->
+<section id="preview">
+  <div class="container">
+    <div class="sec-label">// 06 — RESULTS DASHBOARD</div>
+    <h2 class="sec-title">What the user sees after the work</h2>
+    <p class="sec-sub">The "Analytics" section keeps the results of all 5 tools in one place. Cards with real data; the "Full analytics" button opens a lupa-modal with the detailed result.</p>
+
+    <div class="dash-mock">
+      <div class="dash-topbar">
+        <div class="dash-title-row">
+          <div class="dash-logo">GO⬡TRENDS</div>
+          <div class="dash-badge">// CARGO BAY · CLASSIFIED DATA</div>
+        </div>
+        <div class="dash-user">BOHDAN</div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="dash-stat-row">
+        <div class="dash-stat">
+          <div class="ds-label">ANALYSES COMPLETED</div>
+          <div class="ds-val">5</div>
+        </div>
+        <div class="dash-stat">
+          <div class="ds-label">CHANNELS RESEARCHED</div>
+          <div class="ds-val">1</div>
+        </div>
+        <div class="dash-stat">
+          <div class="ds-label">IDEAS GENERATED</div>
+          <div class="ds-val">20</div>
+        </div>
+        <div class="dash-stat">
+          <div class="ds-label">LAST UPDATE</div>
+          <div class="ds-date">12.04.2026</div>
+        </div>
+      </div>
+
+      <!-- Tool cards -->
+      <div class="dash-cards-row">
+        <div class="dash-tool-card">
+          <div class="dtc-num">01</div>
+          <div class="dtc-tool t1">CHANNEL ANALYSIS</div>
+          <div class="dtc-value">Oskar Hartmann</div>
+          <div class="dtc-sub">582.0K subscribers · AVG Likes 89.4K · ER: 2.43% · 2 videos/mo</div>
+          <div class="dtc-footer">
+            <div class="dtc-date">12.04.2026</div>
+            <div class="dtc-btn">FULL ANALYTICS →</div>
+          </div>
+        </div>
+        <div class="dash-tool-card">
+          <div class="dtc-num">02</div>
+          <div class="dtc-tool t2">COMPETITOR ANALYSIS</div>
+          <div class="dtc-value">@Oskar Hartmann · @@margulan_seissembai</div>
+          <div class="dtc-sub">Educational content — a focus on business education through online courses and training.</div>
+          <div class="dtc-footer">
+            <div class="dtc-date">12.04.2026</div>
+            <div class="dtc-btn">FULL ANALYTICS →</div>
+          </div>
+        </div>
+        <div class="dash-tool-card">
+          <div class="dtc-num">03</div>
+          <div class="dtc-tool t3">CONTENT PLAN</div>
+          <div class="dtc-value">20 IDEAS</div>
+          <div class="dtc-sub">How AI Will Change the Business Model Tomorrow · long 12–15 min<br>Artificial Intelligence: A Special Guest · long 15–18 min</div>
+          <div class="dtc-footer">
+            <div class="dtc-date">12.04.2026</div>
+            <div class="dtc-btn">FULL ANALYTICS →</div>
+          </div>
+        </div>
+        <div class="dash-tool-card">
+          <div class="dtc-num">04</div>
+          <div class="dtc-tool t4">TREND ANALYSIS</div>
+          <div class="dtc-value" style="font-size:13px; display:flex; flex-wrap:wrap; gap:5px;">
+            <span style="background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.2); border-radius:4px; padding:2px 8px; font-size:11px;">🔥 Personalized content</span>
+            <span style="background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.2); border-radius:4px; padding:2px 8px; font-size:11px;">🔥 AI-generated content</span>
+            <span style="background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.2); border-radius:4px; padding:2px 8px; font-size:11px;">🔥 Cross-platform collaborations</span>
+          </div>
+          <div class="dtc-footer" style="margin-top:12px;">
+            <div class="dtc-date">12.04.2026</div>
+            <div class="dtc-btn">FULL ANALYTICS →</div>
+          </div>
+        </div>
+        <div class="dash-tool-card" style="border-right:none;">
+          <div class="dtc-num">05</div>
+          <div class="dtc-tool t5">GROWTH STRATEGY</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:10px;">
+            <div style="background:rgba(167,139,250,.08); border:1px solid rgba(167,139,250,.15); border-radius:6px; padding:8px; text-align:center;">
+              <div style="font-family:var(--head); font-size:14px; font-weight:900; color:#a78bfa;">1 000</div>
+              <div style="font-family:var(--mono); font-size:9px; color:var(--muted);">subscribers</div>
+            </div>
+            <div style="background:rgba(167,139,250,.08); border:1px solid rgba(167,139,250,.15); border-radius:6px; padding:8px; text-align:center;">
+              <div style="font-family:var(--head); font-size:14px; font-weight:900; color:#a78bfa;">5 000</div>
+              <div style="font-family:var(--mono); font-size:9px; color:var(--muted);">views</div>
+            </div>
+            <div style="background:rgba(167,139,250,.08); border:1px solid rgba(167,139,250,.15); border-radius:6px; padding:8px; text-align:center;">
+              <div style="font-family:var(--head); font-size:14px; font-weight:900; color:#a78bfa;">10%</div>
+              <div style="font-family:var(--mono); font-size:9px; color:var(--muted);">engagement</div>
+            </div>
+          </div>
+          <div class="dtc-sub">Month 1 Week 1–2 · Creating and publishing content that combines business and AI</div>
+          <div class="dtc-footer">
+            <div class="dtc-date">12.04.2026</div>
+            <div class="dtc-btn">FULL ANALYTICS →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SETUP ══ -->
+<section id="setup">
+  <div class="container">
+    <div class="sec-label">// 07 — LAUNCH</div>
+    <h2 class="sec-title">What's needed to set it up</h2>
+    <p class="sec-sub">Five steps from zero to a fully live platform. All the infrastructure is self-hosted on a single VPS.</p>
+    <div class="setup-list">
+      <div class="setup-item">
+        <div class="setup-n">01</div>
+        <div class="setup-text">
+          <b>Supabase — database and authorization</b>
+          Create a project, deploy 4 tables (users, user_state, dialog_history, tool_results) + the documents table with pgvector for RAG. Enable the vector extension. Save the anon key and URL.
+        </div>
+      </div>
+      <div class="setup-item">
+        <div class="setup-n">02</div>
+        <div class="setup-text">
+          <b>n8n on a Hostinger VPS — the orchestrator</b>
+          Install n8n via Docker or npm. Import the 10 JSON workflows. Configure the credentials: Supabase GoTrends (HTTP Header Auth with apikey), OpenAI (openAiApi), Apify (API key), Tavily (API key). Activate all the workflows.
+        </div>
+      </div>
+      <div class="setup-item">
+        <div class="setup-n">03</div>
+        <div class="setup-text">
+          <b>Babylon.js 3D models — Osiris on GitHub Pages</b>
+          Upload 3 GLB files (base.glb, breathing.glb, touch.glb) to a GitHub Pages repository. Get the public URL for each model. Wire them into the frontend code — Babylon.js loads the GLB directly from the CDN.
+        </div>
+      </div>
+      <div class="setup-item">
+        <div class="setup-n">04</div>
+        <div class="setup-text">
+          <b>Frontend deployment — HTML on the VPS + Telegram Web App</b>
+          Copy gotrends.html to the Hostinger VPS into the nginx/apache directory. Register a domain or use the VPS IP. For the Telegram Web App — a separate osiris-webapp.html with a transparent background. Deploy: locally → push to GitHub → curl the raw URL onto the VPS.
+        </div>
+      </div>
+      <div class="setup-item">
+        <div class="setup-n">05</div>
+        <div class="setup-text">
+          <b>Telegram Bot + Osiris Memory (RAG)</b>
+          Create a bot via @BotFather. Set the webhook URL to n8n. Register the domain for the Web App via /setdomain. Upload the GoTrends knowledge base to the Google Drive "Osiris" folder — the Osiris Memory workflow auto-vectorizes it and loads it into pgvector on every file update.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ RESULTS ══ -->
+<section id="results">
+  <div class="container">
+    <div class="sec-label">// 08 — RESULTS</div>
+    <h2 class="sec-title">What the platform delivers</h2>
+    <p class="sec-sub">The key metrics after a full cycle — from channel analysis to a finished strategy.</p>
+    <div class="results-grid">
+      <div class="res-card rc-gold">
+        <div class="res-num">~60 s</div>
+        <div class="res-desc">From clicking the "Analyze" button to a finished result for the channel. Apify + GPT-4o in parallel.</div>
+      </div>
+      <div class="res-card rc-blue">
+        <div class="res-num">30 ideas</div>
+        <div class="res-desc">A maximum content plan with titles, hooks and formats — generated in 20–40 seconds.</div>
+      </div>
+      <div class="res-card rc-green">
+        <div class="res-num">1 file</div>
+        <div class="res-desc">The entire frontend is one HTML file. No frameworks, no build process, no dependencies. Just open it and work.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STACK ══ -->
+<section id="stack">
+  <div class="container">
+    <div class="sec-label">// 09 — STACK</div>
+    <h2 class="sec-title">Technology under the hood</h2>
+    <p class="sec-sub">Each tool is chosen for a specific task. Nothing superfluous — only what's actually used.</p>
+    <div class="stack-grid">
+      <div class="stack-card">
+        <div class="stack-icon">⚡</div>
+        <div class="stack-name">n8n</div>
+        <div class="stack-role">AUTOMATION ORCHESTRATOR</div>
+        <div class="stack-desc">Self-hosted on a Hostinger VPS. 10 workflows, each a separate endpoint. All the logic between the AI, the scraper and the database.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">🗄️</div>
+        <div class="stack-name">Supabase</div>
+        <div class="stack-role">DATABASE + PGVECTOR</div>
+        <div class="stack-desc">PostgreSQL as the main DB. pgvector for Osiris's RAG knowledge base. 5 tables, a REST API with no extra backend.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">🧠</div>
+        <div class="stack-name">GPT-4o</div>
+        <div class="stack-role">AI ENGINE</div>
+        <div class="stack-desc">On every floor — analysis, generation, strategy. The Osiris assistant. Prompts with forced JSON output.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">🕷️</div>
+        <div class="stack-name">Apify</div>
+        <div class="stack-role">DATA SCRAPING</div>
+        <div class="stack-desc">YouTube Data Scraper, Instagram Profile Scraper, TikTok Scraper. Floors 1 and 2. Platform auto-detection by URL.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">🔍</div>
+        <div class="stack-name">Tavily</div>
+        <div class="stack-role">WEB SEARCH API</div>
+        <div class="stack-desc">Advanced search for trend analysis and competitor context. search_depth: advanced, include_answer: true.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">🤖</div>
+        <div class="stack-name">Babylon.js</div>
+        <div class="stack-role">3D ENGINE</div>
+        <div class="stack-desc">Renders the three Osiris GLB models (base/breathing/touch). Hosted on GitHub Pages. Switching between animations by state.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">✈️</div>
+        <div class="stack-name">Telegram Bot API</div>
+        <div class="stack-role">MESSENGER CHANNEL</div>
+        <div class="stack-desc">Bot + Web App + transparent Osiris page. editMessageMedia via HTTP Request (not the native node). user_state synchronization.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">☁️</div>
+        <div class="stack-name">Hostinger VPS</div>
+        <div class="stack-role">INFRASTRUCTURE</div>
+        <div class="stack-desc">n8n, the frontend (nginx), the Telegram Web App — all on a single VPS. srv1421181.hstgr.cloud. Deploy via curl + GitHub.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-logo"><span class="nav-dot"></span>GO⬡TRENDS — AI PLATFORM</div>
+  <div class="footer-meta">Bohdan Hodliuk · AI Architect · 2026 · Confidential</div>
+  <div class="footer-tags">
+    <span class="footer-tag">n8n</span>
+    <span class="footer-tag">Supabase</span>
+    <span class="footer-tag">GPT-4o</span>
+    <span class="footer-tag">Apify</span>
+    <span class="footer-tag">Tavily</span>
+    <span class="footer-tag">Babylon.js</span>
+    <span class="footer-tag">Telegram</span>
+  </div>
+</footer>
+
+</body>
+</html>
