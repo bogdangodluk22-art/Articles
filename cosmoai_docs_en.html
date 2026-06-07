@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CosmoAI — Lumière | Documentation</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg2: #0f1423;
+    --bg3: #141928;
+    --border: rgba(255,255,255,0.07);
+    --blue: #4f8ef7;
+    --green: #3ecf8e;
+    --orange: #f97316;
+    --purple: #a855f7;
+    --teal: #14b8a6;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --card: rgba(255,255,255,0.03);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'Manrope', sans-serif; font-size: 16px; line-height: 1.6; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(62,207,142,0.4); }
+    50% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(62,207,142,0); }
+  }
+  @keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  @keyframes flowLine {
+    0%   { stroke-dashoffset: 200; }
+    100% { stroke-dashoffset: 0; }
+  }
+
+  .fade-up { animation: fadeUp 0.7s ease both; }
+  .fade-up:nth-child(1) { animation-delay: 0.1s; }
+  .fade-up:nth-child(2) { animation-delay: 0.25s; }
+  .fade-up:nth-child(3) { animation-delay: 0.4s; }
+  .fade-up:nth-child(4) { animation-delay: 0.55s; }
+  .fade-up:nth-child(5) { animation-delay: 0.7s; }
+
+  /* LAYOUT */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+  section { padding: 80px 0; }
+  hr.sep { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .section-label span { color: var(--blue); }
+
+  .section-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .section-sub {
+    color: var(--muted);
+    font-size: 15px;
+    margin-bottom: 48px;
+    max-width: 540px;
+  }
+
+  /* ══ HERO ══ */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    padding: 120px 0 80px;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -200px; left: -200px;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(79,142,247,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(168,85,247,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--green);
+    letter-spacing: 0.1em;
+    margin-bottom: 28px;
+  }
+  .hero-badge .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse-dot 2s infinite;
+  }
+  .hero h1 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(32px, 5vw, 58px);
+    font-weight: 900;
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: 24px;
+  }
+  .hero h1 .accent { color: var(--blue); }
+  .hero-sub {
+    font-size: 17px;
+    color: #94a3b8;
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .meta-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    background: var(--card);
+  }
+  .meta-tag.blue  { border-color: rgba(79,142,247,0.3);  color: var(--blue);   background: rgba(79,142,247,0.07); }
+  .meta-tag.green { border-color: rgba(62,207,142,0.3);  color: var(--green);  background: rgba(62,207,142,0.07); }
+  .meta-tag.ora   { border-color: rgba(249,115,22,0.3);  color: var(--orange); background: rgba(249,115,22,0.07); }
+  .meta-tag.pur   { border-color: rgba(168,85,247,0.3);  color: var(--purple); background: rgba(168,85,247,0.07); }
+
+  /* ══ OVERVIEW CARDS ══ */
+  .cards-2x2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 640px) { .cards-2x2 { grid-template-columns: 1fr; } }
+  .ov-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .ov-card:hover { transform: translateY(-3px); }
+  .ov-card:nth-child(1):hover { border-color: rgba(79,142,247,0.4); }
+  .ov-card:nth-child(2):hover { border-color: rgba(62,207,142,0.4); }
+  .ov-card:nth-child(3):hover { border-color: rgba(249,115,22,0.4); }
+  .ov-card:nth-child(4):hover { border-color: rgba(168,85,247,0.4); }
+  .ov-icon { font-size: 28px; margin-bottom: 14px; }
+  .ov-card h3 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .ov-card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+  .ov-card:nth-child(1) h3 { color: var(--blue); }
+  .ov-card:nth-child(2) h3 { color: var(--green); }
+  .ov-card:nth-child(3) h3 { color: var(--orange); }
+  .ov-card:nth-child(4) h3 { color: var(--purple); }
+
+  /* ══ WOW BANNER ══ */
+  .wow-banner {
+    border-radius: 20px;
+    padding: 56px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg2);
+  }
+  .wow-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    padding: 1.5px;
+    background: linear-gradient(135deg, var(--blue), var(--purple), var(--green), var(--blue));
+    background-size: 300% 300%;
+    animation: gradientShift 4s ease infinite;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  .wow-banner .wow-emoji { font-size: 48px; margin-bottom: 16px; }
+  .wow-banner h2 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(24px, 3.5vw, 38px);
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .wow-banner h2 span { color: var(--blue); }
+  .wow-banner p { color: var(--muted); font-size: 15px; }
+
+  /* ══ ARCHITECTURE ══ */
+  .arch-steps { display: flex; flex-direction: column; gap: 0; }
+  .arch-step {
+    display: flex;
+    gap: 24px;
+    position: relative;
+  }
+  .arch-step-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .step-num {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .step-line {
+    width: 2px;
+    flex: 1;
+    min-height: 32px;
+    margin: 4px 0;
+  }
+  .arch-step:last-child .step-line { display: none; }
+
+  .step-blue   { background: rgba(79,142,247,0.15);  color: var(--blue);   border: 1px solid rgba(79,142,247,0.4); }
+  .step-orange { background: rgba(249,115,22,0.15);  color: var(--orange); border: 1px solid rgba(249,115,22,0.4); }
+  .step-purple { background: rgba(168,85,247,0.15);  color: var(--purple); border: 1px solid rgba(168,85,247,0.4); }
+  .step-green  { background: rgba(62,207,142,0.15);  color: var(--green);  border: 1px solid rgba(62,207,142,0.4); }
+  .step-teal   { background: rgba(20,184,166,0.15);  color: var(--teal);   border: 1px solid rgba(20,184,166,0.4); }
+  .line-blue   { background: linear-gradient(to bottom, rgba(79,142,247,0.4), transparent); }
+  .line-orange { background: linear-gradient(to bottom, rgba(249,115,22,0.4), transparent); }
+  .line-purple { background: linear-gradient(to bottom, rgba(168,85,247,0.4), transparent); }
+  .line-green  { background: linear-gradient(to bottom, rgba(62,207,142,0.4), transparent); }
+
+  .step-content {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 12px;
+    flex: 1;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .step-content:hover { transform: translateX(4px); }
+  .arch-step:nth-child(1) .step-content:hover { border-color: rgba(79,142,247,0.35); }
+  .arch-step:nth-child(2) .step-content:hover { border-color: rgba(249,115,22,0.35); }
+  .arch-step:nth-child(3) .step-content:hover { border-color: rgba(168,85,247,0.35); }
+  .arch-step:nth-child(4) .step-content:hover { border-color: rgba(62,207,142,0.35); }
+  .arch-step:nth-child(5) .step-content:hover { border-color: rgba(20,184,166,0.35); }
+
+  .step-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .step-desc { font-size: 14px; color: #94a3b8; margin-bottom: 12px; line-height: 1.6; }
+  .step-hint {
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .step-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .step-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 9px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.05);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  /* ══ DATA SCHEMA ══ */
+  .schema-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 768px) { .schema-grid { grid-template-columns: 1fr; } }
+  .schema-table {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .schema-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .schema-header span {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .schema-row {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr auto;
+    gap: 8px;
+    align-items: center;
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    transition: background 0.15s;
+  }
+  .schema-row:last-child { border-bottom: none; }
+  .schema-row:hover { background: rgba(255,255,255,0.02); }
+  .schema-row .field-name { font-family: 'JetBrains Mono', monospace; color: #e2e8f0; font-size: 12px; }
+  .schema-row .field-desc { color: var(--muted); }
+  .ft-str { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(79,142,247,0.12); color: var(--blue); border: 1px solid rgba(79,142,247,0.25); }
+  .ft-dt  { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(62,207,142,0.12); color: var(--green); border: 1px solid rgba(62,207,142,0.25); }
+  .ft-id  { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(249,115,22,0.12); color: var(--orange); border: 1px solid rgba(249,115,22,0.25); }
+  .ft-num { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(168,85,247,0.12); color: var(--purple); border: 1px solid rgba(168,85,247,0.25); }
+  .ft-opt { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(20,184,166,0.12); color: var(--teal); border: 1px solid rgba(20,184,166,0.25); }
+
+  /* ══ TELEGRAM PREVIEW ══ */
+  .phone-wrap {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .phone-frame {
+    background: #1a1f2e;
+    border-radius: 28px;
+    padding: 12px;
+    border: 2px solid rgba(255,255,255,0.08);
+    width: 320px;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+  }
+  .phone-screen {
+    background: #0e1621;
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  .phone-header {
+    background: #17212b;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .phone-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .phone-name { font-size: 14px; font-weight: 600; color: #fff; }
+  .phone-status { font-size: 11px; color: var(--green); }
+  .phone-messages { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .msg {
+    max-width: 88%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .msg-in  { background: #2b5278; align-self: flex-end; border-bottom-right-radius: 4px; }
+  .msg-out { background: #1c3a5e; align-self: flex-start; border-bottom-left-radius: 4px; }
+  .msg-time { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 4px; text-align: right; }
+  .phone-label {
+    text-align: center;
+    margin-top: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ══ SETUP ══ */
+  .setup-steps { display: flex; flex-direction: column; gap: 16px; }
+  .setup-step {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 26px;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .setup-step:hover { transform: translateX(4px); border-color: rgba(79,142,247,0.3); }
+  .setup-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: rgba(79,142,247,0.3);
+    flex-shrink: 0;
+    width: 32px;
+    line-height: 1;
+    margin-top: 2px;
+  }
+  .setup-step h4 { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .setup-step p  { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  /* ══ RESULTS ══ */
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 640px) { .results-grid { grid-template-columns: 1fr; } }
+  .result-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 24px;
+    text-align: center;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .result-card:hover { transform: translateY(-4px); }
+  .result-card:nth-child(1):hover { border-color: rgba(79,142,247,0.4); }
+  .result-card:nth-child(2):hover { border-color: rgba(62,207,142,0.4); }
+  .result-card:nth-child(3):hover { border-color: rgba(168,85,247,0.4); }
+  .result-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 42px;
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+  .result-card:nth-child(1) .result-num { color: var(--blue); }
+  .result-card:nth-child(2) .result-num { color: var(--green); }
+  .result-card:nth-child(3) .result-num { color: var(--purple); }
+  .result-card p { font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+  /* ══ STACK ══ */
+  .stack-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 640px) { .stack-grid { grid-template-columns: 1fr 1fr; } }
+  .stack-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 20px;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .stack-card:hover { transform: translateY(-3px); border-color: rgba(79,142,247,0.3); }
+  .stack-icon { font-size: 26px; margin-bottom: 10px; }
+  .stack-name { font-family: 'Unbounded', sans-serif; font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .stack-role { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  /* ══ FOOTER ══ */
+  footer {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: 40px 0;
+    text-align: center;
+  }
+  footer .footer-logo {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 18px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  footer .footer-logo span { color: var(--blue); }
+  footer .footer-stack { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+  footer .footer-note { font-size: 13px; color: var(--muted); margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
+<section class="hero">
+  <div class="container">
+    <div class="fade-up hero-badge">
+      <div class="dot"></div>
+      // COSMOAI — LUMIÈRE
+    </div>
+    <h1 class="fade-up">
+      AI administrator<br>
+      for a <span class="accent">cosmetology</span><br>
+      clinic
+    </h1>
+    <p class="hero-sub fade-up">
+      A system that holds a conversation with the client, collects the data, stores it in the CRM and sends the manager a ready lead card — without a single live person, 24/7.
+    </p>
+    <div class="hero-meta fade-up">
+      <span class="meta-tag blue">ElevenLabs AI Agent</span>
+      <span class="meta-tag green">Airtable CRM</span>
+      <span class="meta-tag ora">Google Drive</span>
+      <span class="meta-tag pur">Telegram Bot</span>
+      <span class="meta-tag">n8n Automation</span>
+      <span class="meta-tag">Google Gemini</span>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════
+     1. OVERVIEW
+══════════════════════════════════════════ -->
+<section>
+  <div class="container">
+    <div class="section-label"><span>//</span> 01 — OVERVIEW</div>
+    <h2 class="section-title">What the system can do</h2>
+    <p class="section-sub">Four key capabilities that replace an administrator's work</p>
+
+    <div class="cards-2x2">
+      <div class="ov-card">
+        <div class="ov-icon">🎙️</div>
+        <h3>Voice and text — one system</h3>
+        <p>Daryna communicates with the client both by voice and through text chat. Whatever the method — the result is the same: a completed lead card in the CRM.</p>
+      </div>
+      <div class="ov-card">
+        <div class="ov-icon">⚡</div>
+        <h3>Instant Telegram notification</h3>
+        <p>The moment the client leaves their details — the manager gets a message. No need to check the CRM, email or missed calls.</p>
+      </div>
+      <div class="ov-card">
+        <div class="ov-icon">📊</div>
+        <h3>AI quality analysis of every conversation</h3>
+        <p>After every call, Gemini scores the conversation against 8 criteria and writes a summary. The owner sees the analytics without listening to recordings.</p>
+      </div>
+      <div class="ov-card">
+        <div class="ov-icon">🔄</div>
+        <h3>Smart deduplication</h3>
+        <p>If both an instant webhook and a transcription come in from the client — the system merges them into a single record instead of creating duplicates.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════
+     WOW BANNER
+══════════════════════════════════════════ -->
+<section style="padding: 48px 0;">
+  <div class="container">
+    <div class="wow-banner">
+      <div class="wow-emoji">⚡</div>
+      <h2>From request to lead card — <span>less than 3 seconds</span></h2>
+      <p>The client sends their last message — and even before they close the chat, the manager has already received the notification in Telegram</p>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════
+     3. ARCHITECTURE
+══════════════════════════════════════════ -->
+<section>
+  <div class="container">
+    <div class="section-label"><span>//</span> 02 — ARCHITECTURE</div>
+    <h2 class="section-title">How it works</h2>
+    <p class="section-sub">From the client's first word to a card in the CRM — 5 steps</p>
+
+    <div class="arch-steps">
+
+      <div class="arch-step">
+        <div class="arch-step-left">
+          <div class="step-num step-blue">01</div>
+          <div class="step-line line-blue"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-title">The client starts the conversation</div>
+          <div class="step-desc">The client writes in the chat on the website or makes a call — and is connected to Daryna right away. She greets them, finds out which procedure they're interested in, talks about prices and answers questions.</div>
+          <div class="step-hint">💡 Daryna knows the entire price list, the FAQ and the sales script. She never gets tired and never makes mistakes with prices.</div>
+          <div class="step-tags">
+            <span class="step-tag">ElevenLabs Conversational AI</span>
+            <span class="step-tag">voice + text</span>
+            <span class="step-tag">Ukrainian language</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-step-left">
+          <div class="step-num step-orange">02</div>
+          <div class="step-line line-orange"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-title">The agent collects the data and sends a webhook</div>
+          <div class="step-desc">When the client is ready to book — Daryna collects the name, phone, service and convenient time. ElevenLabs sends this data to n8n via a webhook.</div>
+          <div class="step-hint">💡 For voice calls — after the conversation ends, ElevenLabs separately sends the full transcription and an audio file.</div>
+          <div class="step-tags">
+            <span class="step-tag">webhook POST</span>
+            <span class="step-tag">submit_lead tool call</span>
+            <span class="step-tag">post_call_transcription</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-step-left">
+          <div class="step-num step-purple">03</div>
+          <div class="step-line line-purple"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-title">n8n parses the event type and runs the right branch</div>
+          <div class="step-desc">The workflow determines what came in — an instant lead from the chat, a voice call, or a transcription of a text conversation — and runs the corresponding processing branch.</div>
+          <div class="step-hint">💡 Three branches: submit_lead (chat) → voice_call (voice) → chat_transcript (chat transcription). Each branch does its own job without overlap.</div>
+          <div class="step-tags">
+            <span class="step-tag">n8n Switch node</span>
+            <span class="step-tag">event_type detection</span>
+            <span class="step-tag">text_only flag</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-step-left">
+          <div class="step-num step-green">04</div>
+          <div class="step-line line-blue"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-title">Gemini analyzes the conversation and writes a summary</div>
+          <div class="step-desc">Google Gemini receives the transcription and performs two tasks: it scores the assistant's quality of work against 8 criteria (QA) and writes a short summary of the conversation for the manager.</div>
+          <div class="step-hint">💡 For voice calls, the MP3 audio file is stored on Google Drive — the manager can listen to it if needed.</div>
+          <div class="step-tags">
+            <span class="step-tag">Gemini 2.5 Flash</span>
+            <span class="step-tag">QA scoring (8 criteria)</span>
+            <span class="step-tag">ai_summary generation</span>
+            <span class="step-tag">Google Drive MP3</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-step-left">
+          <div class="step-num step-teal">05</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-title">The data is saved to the CRM — the manager gets a notification</div>
+          <div class="step-desc">The lead card and the call record are saved to Airtable with a full link between them. The manager receives a single Telegram message with all the information — nothing extra.</div>
+          <div class="step-tags">
+            <span class="step-tag">Airtable upsert</span>
+            <span class="step-tag">lead_id → call link</span>
+            <span class="step-tag">Telegram Bot API</span>
+            <span class="step-tag">one notification only</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════
+     4. DATA
+══════════════════════════════════════════ -->
+<section>
+  <div class="container">
+    <div class="section-label"><span>//</span> 03 — DATA</div>
+    <h2 class="section-title">What is stored</h2>
+    <p class="section-sub">Two tables in Airtable — Leads and Calls — linked to each other</p>
+
+    <div class="schema-grid">
+
+      <!-- LEADS -->
+      <div class="schema-table">
+        <div class="schema-header">
+          <span>👤 Leads</span>
+          <span style="color:var(--muted);font-size:12px;font-family:'JetBrains Mono',monospace;">tblEW6ZKXjw194RLq</span>
+        </div>
+        <div class="schema-row"><span class="field-name">client_name</span><span class="field-desc">Client's name</span><span class="ft-str">string</span></div>
+        <div class="schema-row"><span class="field-name">client_phone</span><span class="field-desc">Phone number (key for upsert)</span><span class="ft-str">string</span></div>
+        <div class="schema-row"><span class="field-name">call_id</span><span class="field-desc">Conversation ID from ElevenLabs</span><span class="ft-str">string</span></div>
+        <div class="schema-row"><span class="field-name">created_at</span><span class="field-desc">Date and time of the request</span><span class="ft-dt">datetime</span></div>
+        <div class="schema-row"><span class="field-name">service_interest</span><span class="field-desc">Which procedure they're interested in</span><span class="ft-str">string</span></div>
+        <div class="schema-row"><span class="field-name">budget</span><span class="field-desc">Client's budget</span><span class="ft-str">string</span></div>
+        <div class="schema-row"><span class="field-name">urgency</span><span class="field-desc">Urgency: high / medium / low</span><span class="ft-opt">options</span></div>
+        <div class="schema-row"><span class="field-name">booking_result</span><span class="field-desc">Result: booked / callback / rejected</span><span class="ft-opt">options</span></div>
+        <div class="schema-row"><span class="field-name">preferred_time</span><span class="field-desc">Preferred booking time</span><span class="ft-str">string</span></div>
+        <div class="schema-row"><span class="field-name">ai_summary</span><span class="field-desc">AI summary of the conversation (updated)</span><span class="ft-str">string</span></div>
+        <div class="schema-row"><span class="field-name">source</span><span class="field-desc">Channel: voice or chat</span><span class="ft-opt">options</span></div>
+        <div class="schema-row"><span class="field-name">status</span><span class="field-desc">Lead processing status</span><span class="ft-opt">options</span></div>
+        <div class="schema-row"><span class="field-name">call_link</span><span class="field-desc">Link to the call record in Calls</span><span class="ft-id">relation</span></div>
+      </div>
+
+      <!-- CALLS -->
+      <div class="schema-table">
+        <div class="schema-header">
+          <span>📞 Calls</span>
+          <span style="color:var(--muted);font-size:12px;font-family:'JetBrains Mono',monospace;">tbl7Mtik4wn6rSysP</span>
+        </div>
+        <div class="schema-row"><span class="field-name">call_id</span><span class="field-desc">Conversation ID from ElevenLabs</span><span class="ft-str">string</span></div>
+        <div class="schema-row"><span class="field-name">call_date</span><span class="field-desc">Date and time of the call</span><span class="ft-dt">datetime</span></div>
+        <div class="schema-row"><span class="field-name">duration_sec</span><span class="field-desc">Conversation duration in seconds</span><span class="ft-num">number</span></div>
+        <div class="schema-row"><span class="field-name">call_status</span><span class="field-desc">Status: completed / missed</span><span class="ft-opt">options</span></div>
+        <div class="schema-row"><span class="field-name">transcription</span><span class="field-desc">Full text of the conversation</span><span class="ft-str">string</span></div>
+        <div class="schema-row"><span class="field-name">audio_url</span><span class="field-desc">Link to the MP3 on Google Drive</span><span class="ft-str">string</span></div>
+        <div class="schema-row"><span class="field-name">score_total</span><span class="field-desc">Overall quality score (0–8)</span><span class="ft-num">number</span></div>
+        <div class="schema-row"><span class="field-name">tone</span><span class="field-desc">Tone: positive / neutral / negative</span><span class="ft-opt">options</span></div>
+        <div class="schema-row"><span class="field-name">tone_reason</span><span class="field-desc">AI justification for the tone</span><span class="ft-str">string</span></div>
+        <div class="schema-row"><span class="field-name">criterion_01–08</span><span class="field-desc">Scores for the 8 quality criteria (0 or 1)</span><span class="ft-num">number</span></div>
+        <div class="schema-row"><span class="field-name">evidence_01–08</span><span class="field-desc">Quotes from the conversation as evidence for the scores</span><span class="ft-str">string</span></div>
+        <div class="schema-row"><span class="field-name">source</span><span class="field-desc">Channel: voice or chat</span><span class="ft-opt">options</span></div>
+        <div class="schema-row"><span class="field-name">lead_id</span><span class="field-desc">Link to the record in the Leads table</span><span class="ft-id">relation</span></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════
+     5. PREVIEW
+══════════════════════════════════════════ -->
+<section>
+  <div class="container">
+    <div class="section-label"><span>//</span> 04 — PREVIEW</div>
+    <h2 class="section-title">What the manager sees</h2>
+    <p class="section-sub">Two types of notifications depending on the channel — chat or voice</p>
+
+    <div class="phone-wrap">
+
+      <!-- CHAT MESSAGE -->
+      <div>
+        <div class="phone-frame">
+          <div class="phone-screen">
+            <div class="phone-header">
+              <div class="phone-avatar">✨</div>
+              <div>
+                <div class="phone-name">CosmoAI — Lumière</div>
+                <div class="phone-status">● online</div>
+              </div>
+            </div>
+            <div class="phone-messages">
+              <div class="msg msg-out">
+                🔵 <strong>CHAT — BOOKING CONFIRMED</strong><br>
+                ━━━━━━━━━━━━━━━━<br>
+                👤 <strong>Name:</strong> Kateryna<br>
+                📞 <strong>Phone:</strong> +380 67 123 45 67<br>
+                💆 <strong>Request:</strong> Botulinum therapy (3 areas)<br>
+                💰 <strong>Budget:</strong> up to UAH 7,000<br>
+                📅 <strong>Time:</strong> Wednesday, 14:00<br>
+                ⏰ <strong>Urgency:</strong> 🟡 Medium<br>
+                ━━━━━━━━━━━━━━━━<br>
+                📝 <strong>Summary:</strong> Client Kateryna is interested in botulinum therapy as a 3-area package, budget up to UAH 7,000. Tentatively booked for Wednesday at 14:00.
+                <div class="msg-time">23:49 ✓✓</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-label">// chat notification</div>
+      </div>
+
+      <!-- VOICE MESSAGE -->
+      <div>
+        <div class="phone-frame">
+          <div class="phone-screen">
+            <div class="phone-header">
+              <div class="phone-avatar">✨</div>
+              <div>
+                <div class="phone-name">CosmoAI — Lumière</div>
+                <div class="phone-status">● online</div>
+              </div>
+            </div>
+            <div class="phone-messages">
+              <div class="msg msg-out">
+                🟢 <strong>VOICE — BOOKING CONFIRMED</strong><br>
+                ━━━━━━━━━━━━━━━━<br>
+                👤 <strong>Name:</strong> Vladyslav<br>
+                📞 <strong>Phone:</strong> +380 98 763 25 24<br>
+                💆 <strong>Request:</strong> Biorevitalization<br>
+                💰 <strong>Budget:</strong> UAH 10,000<br>
+                📅 <strong>Time:</strong> March 4, 19:00<br>
+                ━━━━━━━━━━━━━━━━<br>
+                🤖 <strong>AI analysis:</strong><br>
+                ⭐ Quality: <strong>7/8</strong><br>
+                😊 Tone: Positive<br>
+                ━━━━━━━━━━━━━━━━<br>
+                📝 Client Vladyslav reached out about biorevitalization. The budget is sufficient for the course. Booked for March 4 at 19:00.
+                <div class="msg-time">11:23 ✓✓</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-label">// voice notification</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════
+     6. LAUNCH
+══════════════════════════════════════════ -->
+<section>
+  <div class="container">
+    <div class="section-label"><span>//</span> 05 — LAUNCH</div>
+    <h2 class="section-title">What's needed to set it up</h2>
+    <p class="section-sub">Five steps from zero to a fully working system</p>
+
+    <div class="setup-steps">
+      <div class="setup-step">
+        <div class="setup-num">1</div>
+        <div>
+          <h4>Set up the ElevenLabs agent</h4>
+          <p>Create the Daryna agent in ElevenLabs, upload the clinic's knowledge base (price list, FAQ, script), connect the webhook to n8n and configure the tool call for passing the form data.</p>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-num">2</div>
+        <div>
+          <h4>Prepare Airtable</h4>
+          <p>Create the Leads and Calls tables with all the fields according to the schema. Obtain the API key and table IDs to connect to n8n.</p>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-num">3</div>
+        <div>
+          <h4>Connect Google Drive and Gemini</h4>
+          <p>Authorize Google Drive OAuth2 and create a folder for storing the audio. Obtain a Gemini API key for analyzing the quality of conversations.</p>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-num">4</div>
+        <div>
+          <h4>Create a Telegram bot and configure notifications</h4>
+          <p>Register a bot via BotFather, obtain the token and Chat ID. Configure the message format to suit the manager's needs.</p>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-num">5</div>
+        <div>
+          <h4>Import the workflow into n8n and activate it</h4>
+          <p>Upload the workflow JSON file, fill in all the credentials, test each of the three branches on sample data and enable auto-run.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════
+     7. RESULTS
+══════════════════════════════════════════ -->
+<section>
+  <div class="container">
+    <div class="section-label"><span>//</span> 06 — RESULT</div>
+    <h2 class="section-title">What changes after launch</h2>
+    <p class="section-sub">Three main changes the owner and the manager feel</p>
+
+    <div class="results-grid">
+      <div class="result-card">
+        <div class="result-num">24/7</div>
+        <p>The system takes requests and answers clients at any time — no days off and no lunch breaks</p>
+      </div>
+      <div class="result-card">
+        <div class="result-num">&lt; 3s</div>
+        <p>From the moment the client leaves their details to the lead card appearing in the manager's Telegram</p>
+      </div>
+      <div class="result-card">
+        <div class="result-num">0</div>
+        <p>Missed requests outside business hours — every inquiry is logged and lands in the CRM</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════
+     8. STACK
+══════════════════════════════════════════ -->
+<section>
+  <div class="container">
+    <div class="section-label"><span>//</span> 07 — STACK</div>
+    <h2 class="section-title">Technology under the hood</h2>
+    <p class="section-sub">Six tools, each in its place</p>
+
+    <div class="stack-grid">
+      <div class="stack-card">
+        <div class="stack-icon">🎙️</div>
+        <div class="stack-name">ElevenLabs</div>
+        <div class="stack-role">AI agent Daryna — runs voice and text conversations, collects the client's data following a script</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">⚙️</div>
+        <div class="stack-name">n8n</div>
+        <div class="stack-role">The heart of the automation — handles webhooks, determines the event type and runs the right branch</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">🧠</div>
+        <div class="stack-name">Google Gemini</div>
+        <div class="stack-role">Analyzes the quality of every conversation against 8 criteria and generates a summary for the manager</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">🗂️</div>
+        <div class="stack-name">Airtable</div>
+        <div class="stack-role">CRM — stores leads and call records and links them to each other through relational fields</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">📁</div>
+        <div class="stack-name">Google Drive</div>
+        <div class="stack-role">Stores MP3 recordings of voice calls with direct links in the Call card</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">📱</div>
+        <div class="stack-name">Telegram Bot</div>
+        <div class="stack-role">Sends one clear notification to the manager — no duplicates, no unnecessary noise</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-logo">CosmoAI — <span>Lumière</span></div>
+    <div class="footer-stack">ElevenLabs · n8n · Gemini · Airtable · Google Drive · Telegram</div>
+    <div class="footer-note">Demo project. All data is fictional and used solely for testing.</div>
+  </div>
+</footer>
+
+</body>
+</html>
