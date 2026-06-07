@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoBot — Technical Documentation</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Unbounded:wght@400;700;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg2: #0f1629;
+    --card: #141c35;
+    --card2: #1a2240;
+    --accent: #4f8ef7;
+    --accent2: #7c3aed;
+    --green: #10b981;
+    --orange: #f59e0b;
+    --red: #ef4444;
+    --teal: #2dd4bf;
+    --pink: #fb7185;
+    --yellow: #fbbf24;
+    --border: rgba(79,142,247,0.15);
+    --border2: rgba(255,255,255,0.06);
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --muted2: #94a3b8;
+    --mono: 'JetBrains Mono', monospace;
+    --head: 'Unbounded', sans-serif;
+    --body: 'Manrope', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--body); min-height: 100vh; overflow-x: hidden; }
+
+  /* ── ANIMATIONS ─────────────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.3; }
+  }
+  @keyframes gradShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  @keyframes scanline {
+    0%   { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  .fade-up { animation: fadeUp 0.7s ease both; }
+  .d1 { animation-delay: 0.1s; }
+  .d2 { animation-delay: 0.25s; }
+  .d3 { animation-delay: 0.4s; }
+  .d4 { animation-delay: 0.55s; }
+  .d5 { animation-delay: 0.7s; }
+
+  /* ── NAV ─────────────────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,14,26,0.85); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px; height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a { font-family: var(--mono); font-size: 11px; color: var(--muted); text-decoration: none; letter-spacing: 0.06em; transition: color 0.2s; text-transform: uppercase; }
+  .nav-links a:hover { color: var(--text); }
+  @media(max-width:700px){ nav { padding: 0 20px; } .nav-links { display: none; } }
+
+  /* ── LAYOUT ─────────────────────────── */
+  section { padding: 96px 48px; border-bottom: 1px solid var(--border2); }
+  @media(max-width:700px){ section { padding: 64px 20px; } }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .sec-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; color: var(--accent); text-transform: uppercase; margin-bottom: 8px; }
+  .sec-title { font-family: var(--head); font-size: clamp(22px,3.5vw,34px); font-weight: 700; margin-bottom: 8px; line-height: 1.15; }
+  .sec-sub { color: var(--muted2); font-size: 15px; line-height: 1.65; max-width: 680px; margin-bottom: 48px; }
+
+  /* ── HERO ─────────────────────────── */
+  #hero {
+    min-height: 100vh; display: flex; align-items: center;
+    position: relative; overflow: hidden; padding-top: 56px;
+    border-bottom: 1px solid var(--border2);
+  }
+  .hero-bg {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 70% 55% at 65% -5%, rgba(79,142,247,0.14) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 40% at 5% 80%, rgba(124,58,237,0.1) 0%, transparent 60%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: linear-gradient(rgba(79,142,247,0.04) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(79,142,247,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-scanline {
+    position: absolute; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(79,142,247,0.15), transparent);
+    animation: scanline 6s linear infinite;
+    pointer-events: none;
+  }
+  .hero-inner { position: relative; z-index: 2; max-width: 1100px; margin: 0 auto; padding: 0 48px; width: 100%; }
+  @media(max-width:700px){ .hero-inner { padding: 0 20px; } }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(79,142,247,0.1); border: 1px solid rgba(79,142,247,0.3);
+    border-radius: 4px; padding: 5px 14px; margin-bottom: 28px;
+    font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.1em;
+  }
+  .hero-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; display: inline-block; }
+  .hero-h1 { font-family: var(--head); font-size: clamp(32px,5.5vw,64px); font-weight: 900; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 24px; }
+  .hero-h1 em { font-style: normal; color: var(--accent); }
+  .hero-sub { font-size: clamp(15px,1.8vw,18px); color: var(--muted2); line-height: 1.7; max-width: 620px; margin-bottom: 36px; }
+  .hero-meta { display: flex; gap: 12px; flex-wrap: wrap; }
+  .hero-tag {
+    font-family: var(--mono); font-size: 11px; padding: 4px 12px;
+    border-radius: 4px; border: 1px solid; letter-spacing: 0.04em;
+  }
+  .ht-blue  { color: var(--accent); border-color: rgba(79,142,247,0.35); background: rgba(79,142,247,0.07); }
+  .ht-green { color: var(--green);  border-color: rgba(16,185,129,0.35);  background: rgba(16,185,129,0.07); }
+  .ht-pur   { color: #a78bfa;       border-color: rgba(167,139,250,0.35); background: rgba(167,139,250,0.07); }
+  .ht-org   { color: var(--orange); border-color: rgba(245,158,11,0.35);  background: rgba(245,158,11,0.07); }
+  .ht-teal  { color: var(--teal);   border-color: rgba(45,212,191,0.35);  background: rgba(45,212,191,0.07); }
+
+  .hero-scroll {
+    position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+    font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.1em;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    animation: float 3s ease-in-out infinite;
+  }
+  .hero-scroll::after { content:''; width:1px; height:32px; background: linear-gradient(var(--muted), transparent); }
+
+  /* ── OVERVIEW CARDS ─────────────────────────── */
+  .overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:700px){ .overview-grid { grid-template-columns: 1fr; } }
+  .ov-card {
+    background: var(--card); border: 1px solid var(--border2);
+    border-radius: 14px; padding: 28px; position: relative; overflow: hidden;
+    transition: border-color 0.25s, transform 0.25s;
+    cursor: default;
+  }
+  .ov-card:hover { transform: translateY(-3px); }
+  .ov-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    border-radius: 14px 14px 0 0;
+  }
+  .ov-card.c-blue::before  { background: linear-gradient(90deg, var(--accent), #7c3aed); }
+  .ov-card.c-green::before { background: linear-gradient(90deg, var(--green), var(--teal)); }
+  .ov-card.c-org::before   { background: linear-gradient(90deg, var(--orange), var(--pink)); }
+  .ov-card.c-pur::before   { background: linear-gradient(90deg, #7c3aed, var(--pink)); }
+
+  .ov-card:hover.c-blue  { border-color: rgba(79,142,247,0.45); }
+  .ov-card:hover.c-green { border-color: rgba(16,185,129,0.45); }
+  .ov-card:hover.c-org   { border-color: rgba(245,158,11,0.45); }
+  .ov-card:hover.c-pur   { border-color: rgba(167,139,250,0.45); }
+
+  .ov-icon { font-size: 28px; margin-bottom: 14px; }
+  .ov-name { font-family: var(--head); font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .ov-desc { font-size: 14px; color: var(--muted2); line-height: 1.6; }
+
+  /* ── WOW BANNER ─────────────────────────── */
+  #wow { background: var(--bg2); }
+  .wow-box {
+    border-radius: 20px; padding: 56px 48px; position: relative; overflow: hidden;
+    background: var(--card);
+    border: 1px solid transparent;
+    background-clip: padding-box;
+  }
+  .wow-box::before {
+    content: ''; position: absolute; inset: -2px; border-radius: 22px; z-index: -1;
+    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--teal), var(--accent));
+    background-size: 300% 300%; animation: gradShift 5s ease infinite;
+  }
+  .wow-label { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; }
+  .wow-text { font-family: var(--head); font-size: clamp(24px,4vw,48px); font-weight: 900; line-height: 1.1; }
+  .wow-text em { font-style: normal; color: var(--accent); }
+  .wow-sub { margin-top: 16px; font-size: 16px; color: var(--muted2); max-width: 560px; line-height: 1.6; }
+  .wow-glow {
+    position: absolute; top: -60px; right: -60px; width: 280px; height: 280px;
+    border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle, rgba(79,142,247,0.18) 0%, transparent 70%);
+  }
+
+  /* ── ARCHITECTURE ─────────────────────────── */
+  .arch-flow { display: flex; flex-direction: column; gap: 0; }
+  .arch-step { display: grid; grid-template-columns: 64px 1fr; gap: 0 24px; position: relative; }
+  .arch-left { display: flex; flex-direction: column; align-items: center; }
+  .arch-num {
+    width: 56px; height: 56px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 14px; font-weight: 700;
+    flex-shrink: 0; position: relative; z-index: 1;
+    transition: transform 0.25s;
+  }
+  .arch-step:hover .arch-num { transform: scale(1.08); }
+  .arch-line { width: 2px; flex: 1; min-height: 20px; background: var(--border); }
+  .arch-step:last-child .arch-line { display: none; }
+  .arch-body { padding-bottom: 36px; }
+  .arch-card {
+    background: var(--card); border: 1px solid var(--border2);
+    border-radius: 12px; padding: 22px 26px;
+    transition: border-color 0.25s, transform 0.25s;
+  }
+  .arch-card:hover { transform: translateX(4px); }
+  .arch-title { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+  .arch-desc { color: var(--muted2); font-size: 13.5px; line-height: 1.65; }
+  .arch-hint {
+    display: flex; align-items: flex-start; gap: 8px;
+    background: rgba(255,255,255,0.04); border-radius: 8px;
+    padding: 10px 14px; margin-top: 12px;
+    font-size: 13px; color: var(--muted); line-height: 1.55;
+  }
+  .arch-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .atag {
+    font-family: var(--mono); font-size: 10px; padding: 3px 10px;
+    border-radius: 4px; border: 1px solid; letter-spacing: 0.02em;
+  }
+  .at-blue  { color: var(--accent); border-color: rgba(79,142,247,0.3);  background: rgba(79,142,247,0.07); }
+  .at-green { color: var(--green);  border-color: rgba(16,185,129,0.3);  background: rgba(16,185,129,0.07); }
+  .at-org   { color: var(--orange); border-color: rgba(245,158,11,0.3);  background: rgba(245,158,11,0.07); }
+  .at-pur   { color: #a78bfa;       border-color: rgba(167,139,250,0.3); background: rgba(167,139,250,0.07); }
+  .at-teal  { color: var(--teal);   border-color: rgba(45,212,191,0.3);  background: rgba(45,212,191,0.07); }
+  .at-pink  { color: var(--pink);   border-color: rgba(251,113,133,0.3); background: rgba(251,113,133,0.07); }
+
+  /* num colors */
+  .n1 { background:rgba(79,142,247,0.15); color:var(--accent); }
+  .n2 { background:rgba(245,158,11,0.15); color:var(--orange); }
+  .n3 { background:rgba(167,139,250,0.15); color:#a78bfa; }
+  .n4 { background:rgba(16,185,129,0.15); color:var(--green); }
+  .n5 { background:rgba(45,212,191,0.15); color:var(--teal); }
+  .n6 { background:rgba(251,113,133,0.15); color:var(--pink); }
+
+  .arch-card.step-blue  { border-left: 3px solid var(--accent); }
+  .arch-card.step-org   { border-left: 3px solid var(--orange); }
+  .arch-card.step-pur   { border-left: 3px solid #a78bfa; }
+  .arch-card.step-green { border-left: 3px solid var(--green); }
+  .arch-card.step-teal  { border-left: 3px solid var(--teal); }
+  .arch-card.step-pink  { border-left: 3px solid var(--pink); }
+
+  /* ── DATA SCHEMA ─────────────────────────── */
+  .schema-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media(max-width:900px){ .schema-grid { grid-template-columns: 1fr; } }
+  .schema-card { background: var(--card); border: 1px solid var(--border2); border-radius: 12px; overflow: hidden; }
+  .schema-head {
+    padding: 14px 20px; border-bottom: 1px solid var(--border2);
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .schema-body { padding: 6px 0; }
+  .field-row {
+    display: grid; grid-template-columns: 180px 1fr 72px;
+    align-items: center; gap: 12px;
+    padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,0.035);
+    font-size: 12.5px;
+  }
+  .field-row:last-child { border-bottom: none; }
+  .field-name { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+  .field-desc { color: var(--muted2); font-size: 12px; }
+  .ft-str { font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 3px; color: var(--accent); border: 1px solid rgba(79,142,247,0.3); background: rgba(79,142,247,0.07); }
+  .ft-dt  { font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 3px; color: var(--green);  border: 1px solid rgba(16,185,129,0.3);  background: rgba(16,185,129,0.07); }
+  .ft-id  { font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 3px; color: var(--orange); border: 1px solid rgba(245,158,11,0.3);  background: rgba(245,158,11,0.07); }
+  .ft-json{ font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 3px; color: #a78bfa;       border: 1px solid rgba(167,139,250,0.3); background: rgba(167,139,250,0.07); }
+  .ft-bool{ font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 3px; color: var(--teal);   border: 1px solid rgba(45,212,191,0.3);  background: rgba(45,212,191,0.07); }
+
+  /* ── PREVIEW ─────────────────────────── */
+  #preview { background: var(--bg2); }
+  .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+  @media(max-width:800px){ .preview-grid { grid-template-columns: 1fr; } }
+
+  /* Phone mockup */
+  .phone-wrap { display: flex; justify-content: center; }
+  .phone {
+    width: 300px; background: #111827; border-radius: 36px;
+    border: 2px solid rgba(255,255,255,0.1);
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
+    overflow: hidden; animation: float 5s ease-in-out infinite;
+  }
+  .phone-top {
+    background: #0d1117; padding: 12px 20px 8px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .phone-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .phone-info { flex: 1; }
+  .phone-name { font-size: 13px; font-weight: 700; }
+  .phone-status { font-size: 11px; color: var(--green); }
+  .phone-body { padding: 16px 14px; display: flex; flex-direction: column; gap: 10px; min-height: 420px; background: #0a0f1e; }
+
+  .msg { display: flex; flex-direction: column; max-width: 85%; }
+  .msg.from-bot { align-self: flex-start; }
+  .msg.from-user { align-self: flex-end; }
+  .bubble {
+    padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.55;
+  }
+  .from-bot .bubble  { background: #1c3a5e; border-bottom-left-radius: 4px; color: var(--text); }
+  .from-user .bubble { background: #2b5278; border-bottom-right-radius: 4px; color: var(--text); }
+  .bubble-time { font-size: 10px; color: var(--muted); margin-top: 3px; align-self: flex-end; font-family: var(--mono); }
+  .from-bot .bubble-time { align-self: flex-start; }
+
+  .kbd-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .kbd-btn {
+    background: rgba(79,142,247,0.15); border: 1px solid rgba(79,142,247,0.35);
+    border-radius: 8px; padding: 6px 10px; font-size: 12px; color: var(--accent); cursor: pointer;
+  }
+
+  /* Manager notification card */
+  .notif-wrap { display: flex; flex-direction: column; gap: 16px; }
+  .notif-label { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+  .notif-card {
+    background: var(--card); border: 1px solid var(--border2); border-radius: 12px;
+    overflow: hidden;
+  }
+  .notif-header {
+    background: linear-gradient(135deg, rgba(79,142,247,0.12), rgba(124,58,237,0.1));
+    padding: 12px 16px; border-bottom: 1px solid var(--border2);
+    font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--accent);
+  }
+  .notif-body { padding: 14px 16px; font-size: 13px; line-height: 1.8; }
+  .notif-row { display: flex; gap: 8px; }
+  .notif-label-inline { color: var(--muted); min-width: 130px; }
+  .notif-val { color: var(--text); font-weight: 600; }
+  .notif-divider { height: 1px; background: var(--border2); margin: 10px 0; }
+  .notif-recs { margin-top: 4px; }
+  .notif-rec { font-size: 12.5px; color: var(--muted2); padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .notif-rec:last-child { border-bottom: none; }
+  .notif-rec span { color: var(--green); font-weight: 700; margin-right: 6px; }
+
+  /* ── SETUP ─────────────────────────── */
+  .setup-list { display: flex; flex-direction: column; gap: 14px; }
+  .setup-item {
+    display: flex; gap: 16px; align-items: flex-start;
+    background: var(--card); border: 1px solid var(--border2);
+    border-radius: 12px; padding: 20px 24px;
+    transition: border-color 0.25s, transform 0.25s;
+  }
+  .setup-item:hover { border-color: rgba(79,142,247,0.35); transform: translateX(4px); }
+  .setup-n {
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 13px; font-weight: 700;
+  }
+  .setup-text b { color: var(--text); font-size: 14px; display: block; margin-bottom: 4px; }
+  .setup-text { color: var(--muted2); font-size: 13.5px; line-height: 1.55; }
+
+  /* ── RESULTS ─────────────────────────── */
+  #results { background: var(--bg2); }
+  .results-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media(max-width:700px){ .results-grid { grid-template-columns: 1fr; } }
+  .res-card {
+    background: var(--card); border: 1px solid var(--border2);
+    border-radius: 14px; padding: 32px 24px; text-align: center;
+    transition: transform 0.25s, border-color 0.25s;
+  }
+  .res-card:hover { transform: translateY(-4px); }
+  .res-card.rc-blue:hover  { border-color: rgba(79,142,247,0.4); }
+  .res-card.rc-green:hover { border-color: rgba(16,185,129,0.4); }
+  .res-card.rc-pur:hover   { border-color: rgba(167,139,250,0.4); }
+  .res-num {
+    font-family: var(--head); font-size: clamp(32px,4.5vw,52px);
+    font-weight: 900; line-height: 1; margin-bottom: 10px;
+  }
+  .rc-blue  .res-num { color: var(--accent); }
+  .rc-green .res-num { color: var(--green); }
+  .rc-pur   .res-num { color: #a78bfa; }
+  .res-desc { font-size: 14px; color: var(--muted2); line-height: 1.55; }
+
+  /* ── STACK ─────────────────────────── */
+  .stack-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px,1fr)); gap: 14px; }
+  .stack-card {
+    background: var(--card); border: 1px solid var(--border2);
+    border-radius: 12px; padding: 20px 22px;
+    transition: transform 0.25s, border-color 0.25s;
+  }
+  .stack-card:hover { transform: translateY(-3px); border-color: rgba(79,142,247,0.35); }
+  .stack-icon { font-size: 26px; margin-bottom: 10px; }
+  .stack-name { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+  .stack-role { font-size: 12px; color: var(--orange); font-family: var(--mono); margin-bottom: 6px; }
+  .stack-desc { font-size: 13px; color: var(--muted2); line-height: 1.5; }
+
+  /* ── FOOTER ─────────────────────────── */
+  footer {
+    background: #060912; border-top: 1px solid var(--border);
+    padding: 36px 48px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+  @media(max-width:700px){ footer { padding: 28px 20px; } }
+  .footer-logo { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); }
+  .footer-meta { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .footer-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+  .footer-tag {
+    font-family: var(--mono); font-size: 10px; padding: 3px 10px;
+    border-radius: 3px; color: var(--muted); border: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">// AUTOBOT</div>
+  <div class="nav-links">
+    <a href="#overview">Overview</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#data">Data</a>
+    <a href="#preview">Preview</a>
+    <a href="#stack">Stack</a>
+  </div>
+</nav>
+
+<!-- ══ HERO ══════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-scanline"></div>
+  <div class="hero-inner">
+    <div class="hero-badge fade-up d1">
+      <span class="hero-dot"></span>
+      // AUTOBOT — DIGITAL AUTO CONSULTANT
+    </div>
+    <h1 class="hero-h1 fade-up d2">AI sales funnel<br><em>from the first word</em><br>to closing the deal</h1>
+    <p class="hero-sub fade-up d3">A full-fledged automated system for an automotive consultant: a Telegram bot with AI-powered matching, a voice assistant on the website, a CRM funnel and auto-posting — all in one ecosystem built on n8n.</p>
+    <div class="hero-meta fade-up d4">
+      <span class="hero-tag ht-blue">n8n + Telegram Bot API</span>
+      <span class="hero-tag ht-green">OpenAI GPT-4o</span>
+      <span class="hero-tag ht-teal">Supabase</span>
+      <span class="hero-tag ht-pur">ElevenLabs Voice</span>
+      <span class="hero-tag ht-org">Airtable CRM</span>
+      <span class="hero-tag ht-blue">Tavily Search</span>
+    </div>
+  </div>
+  <div class="hero-scroll fade-up d5">SCROLL</div>
+</section>
+
+<!-- ══ OVERVIEW ══════════════════════════════════════════ -->
+<section id="overview">
+  <div class="container">
+    <div class="sec-label">// 01 — OVERVIEW</div>
+    <h2 class="sec-title">What the system does</h2>
+    <p class="sec-sub">Four independent modules that together form a single chain: from the client's first message to a warm lead card in the manager's hands.</p>
+    <div class="overview-grid">
+      <div class="ov-card c-blue">
+        <div class="ov-icon">🤖</div>
+        <div class="ov-name">AI car matching in Telegram</div>
+        <div class="ov-desc">The bot guides the client through 7 questions or accepts free-form text. GPT-4o analyzes the profile and selects 3–4 cars from real listings — with photo, description and link.</div>
+      </div>
+      <div class="ov-card c-green">
+        <div class="ov-icon">🌐</div>
+        <div class="ov-name">Voice assistant on the website</div>
+        <div class="ov-desc">An ElevenLabs-powered widget answers customer questions in a lifelike voice, 24/7. Any question about services, prices or the process — an instant answer with no manager involved.</div>
+      </div>
+      <div class="ov-card c-org">
+        <div class="ov-icon">📨</div>
+        <div class="ov-name">Automatic follow-up</div>
+        <div class="ov-desc">Every day the system checks unbooked leads and sends a personalized message — with a photo of the exact car the client was interested in, and a call to action.</div>
+      </div>
+      <div class="ov-card c-pur">
+        <div class="ov-icon">📸</div>
+        <div class="ov-name">Auto-posting to Instagram</div>
+        <div class="ov-desc">Every day at 10:00 the system generates a topic, picks a photo via Unsplash and writes a ready post. The manager gets a preview in Telegram and decides whether to publish or not.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ WOW BANNER ══════════════════════════════════════════ -->
+<section id="wow" style="padding: 64px 48px;">
+  <div class="container">
+    <div class="wow-box">
+      <div class="wow-glow"></div>
+      <div class="wow-label">// the system's core value</div>
+      <div class="wow-text">⚡️ The manager receives <em>a warm lead with a ready profile</em> — instead of a cold call into the void</div>
+      <div class="wow-sub">The client completed the questionnaire themselves, chose the car themselves, and tapped "Contact me" themselves. The manager sees: name, budget, car of interest, convenient time. The deal can be closed right away.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ ARCHITECTURE ══════════════════════════════════════════ -->
+<section id="architecture">
+  <div class="container">
+    <div class="sec-label">// 02 — ARCHITECTURE</div>
+    <h2 class="sec-title">How it works — the full flow</h2>
+    <p class="sec-sub">The path from first contact to a closed deal. Every step is automatic, every action is logged in the CRM.</p>
+
+    <div class="arch-flow">
+
+      <div class="arch-step">
+        <div class="arch-left">
+          <div class="arch-num n1">01</div>
+          <div class="arch-line"></div>
+        </div>
+        <div class="arch-body">
+          <div class="arch-card step-blue">
+            <div class="arch-title">🚪 Entry point — website or Telegram</div>
+            <div class="arch-desc">The client lands on the website and talks to the voice assistant (ElevenLabs), or goes straight to the Telegram bot via a link from Instagram / the website. First contact — without a manager.</div>
+            <div class="arch-hint">💡 The voice assistant knows the answers to all typical questions about the services: what car matching is, how much it costs, how the inspection works — and answers in natural language.</div>
+            <div class="arch-tags">
+              <span class="atag at-blue">ElevenLabs Voice Widget</span>
+              <span class="atag at-teal">Telegram Bot API</span>
+              <span class="atag at-green">Instagram / Site Traffic</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-left">
+          <div class="arch-num n2">02</div>
+          <div class="arch-line"></div>
+        </div>
+        <div class="arch-body">
+          <div class="arch-card step-org">
+            <div class="arch-title">🧠 Session initialization and mode selection</div>
+            <div class="arch-desc">On the first message the bot reads or creates a session in Supabase. The main Switch router determines the state: new user → greeting, returning user → continuation. The client chooses a mode: "Help me pick a car" (questionnaire) or a free-text request.</div>
+            <div class="arch-hint">💡 All memory is stored in Supabase — if the client returns a week later, the bot remembers their profile and can offer to continue with the same parameters.</div>
+            <div class="arch-tags">
+              <span class="atag at-teal">Supabase: GET session</span>
+              <span class="atag at-org">n8n Switch Node (8 outputs)</span>
+              <span class="atag at-blue">POST: session initialization</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-left">
+          <div class="arch-num n3">03</div>
+          <div class="arch-line"></div>
+        </div>
+        <div class="arch-body">
+          <div class="arch-card step-pur">
+            <div class="arch-title">📋 Questionnaire or free request → AI analysis</div>
+            <div class="arch-desc">Mode 1 — the bot asks 7 questions: city, driving frequency, purpose, brands, budget, priorities, new or used. Each answer is saved to Supabase via a PATCH request. Mode 2 — the client writes in free text and GPT recognizes the parameters on its own. After collecting the data, GPT-4o produces 3–4 personalized recommendations in JSON format.</div>
+            <div class="arch-hint">💡 The AI doesn't just filter by price — it takes the client's lifestyle into account. "Family with kids + out-of-town trips + reliability" → Toyota RAV4, not a BMW.</div>
+            <div class="arch-tags">
+              <span class="atag at-pur">OpenAI GPT-4o</span>
+              <span class="atag at-teal">Supabase: PATCH answers</span>
+              <span class="atag at-blue">7-step Quiz Flow</span>
+              <span class="atag at-green">JSON parsing</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-left">
+          <div class="arch-num n4">04</div>
+          <div class="arch-line"></div>
+        </div>
+        <div class="arch-body">
+          <div class="arch-card step-green">
+            <div class="arch-title">🔍 Listing search + car card</div>
+            <div class="arch-desc">When the client picks a car from the recommendations, the system runs Tavily to search for real listings on auto.ria and other marketplaces. In parallel, Unsplash picks a car photo. The client receives a card: photo + name + year + price + link to the listing.</div>
+            <div class="arch-hint">💡 If none of the options fit — the "More options" button triggers a new GPT request with updated recommendations, without resetting the whole flow.</div>
+            <div class="arch-tags">
+              <span class="atag at-green">Tavily Web Search</span>
+              <span class="atag at-blue">Unsplash API</span>
+              <span class="atag at-org">Telegram: sendPhoto</span>
+              <span class="atag at-pur">Supabase: PATCH chosen_car</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-left">
+          <div class="arch-num n5">05</div>
+          <div class="arch-line"></div>
+        </div>
+        <div class="arch-body">
+          <div class="arch-card step-teal">
+            <div class="arch-title">📞 CTA — Consultation booking + CRM</div>
+            <div class="arch-desc">After receiving the recommendations, the bot offers to book a consultation. The client leaves their name and phone number — the data is saved to Airtable (Quiz Leads or Free Leads) and Supabase. The manager receives a Telegram notification with the full lead card: name, phone, AI recommendations, chosen car, convenient time.</div>
+            <div class="arch-tags">
+              <span class="atag at-teal">Airtable: Quiz/Free Leads</span>
+              <span class="atag at-blue">Telegram: notification</span>
+              <span class="atag at-green">Supabase: user profile</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-left">
+          <div class="arch-num n6">06</div>
+          <div class="arch-line"></div>
+        </div>
+        <div class="arch-body">
+          <div class="arch-card step-pink">
+            <div class="arch-title">🔄 Follow-up — Automatic reactivation</div>
+            <div class="arch-desc">Every day at 18:00 the system reads Airtable and finds leads who haven't booked and haven't received a follow-up in less than 3 days. GPT generates a personalized message for each — mentioning the specific car they were interested in. After sending, the last_followup_at field is updated.</div>
+            <div class="arch-hint">💡 This is not a mass mailing — every message is unique. "Hi, Oleksiy! You were interested in the Toyota RAV4. Prices have changed a bit — want to see the current options? 👀"</div>
+            <div class="arch-tags">
+              <span class="atag at-pink">Schedule Trigger 18:00</span>
+              <span class="atag at-pur">OpenAI: personalization</span>
+              <span class="atag at-teal">Airtable: PATCH status</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ DATA ══════════════════════════════════════════ -->
+<section id="data">
+  <div class="container">
+    <div class="sec-label">// 03 — DATA</div>
+    <h2 class="sec-title">What is stored and where</h2>
+    <p class="sec-sub">Two layers of memory: Supabase for the operational state of sessions and Airtable as the CRM system for the manager.</p>
+
+    <div class="schema-grid" style="margin-bottom: 20px;">
+
+      <div class="schema-card">
+        <div class="schema-head" style="color:var(--teal)">🗄️ Supabase — sessions</div>
+        <div class="schema-body">
+          <div class="field-row"><span class="field-name">chat_id</span><span class="field-desc">Unique Telegram chat ID</span><span class="ft-id">id</span></div>
+          <div class="field-row"><span class="field-name">username</span><span class="field-desc">User's @nickname</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">current_step</span><span class="field-desc">Current questionnaire step (1–7)</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">mode</span><span class="field-desc">quiz or free — dialogue mode</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">answers</span><span class="field-desc">JSON with answers to all questionnaire questions</span><span class="ft-json">json</span></div>
+          <div class="field-row"><span class="field-name">ai_recommendations</span><span class="field-desc">Array of recommendations from GPT</span><span class="ft-json">json</span></div>
+          <div class="field-row"><span class="field-name">chosen_car</span><span class="field-desc">Chosen car (make, model, year)</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">created_at</span><span class="field-desc">Time of first contact</span><span class="ft-dt">datetime</span></div>
+          <div class="field-row"><span class="field-name">updated_at</span><span class="field-desc">Last session update</span><span class="ft-dt">datetime</span></div>
+        </div>
+      </div>
+
+      <div class="schema-card">
+        <div class="schema-head" style="color:var(--accent)">📋 Airtable — Quiz Leads</div>
+        <div class="schema-body">
+          <div class="field-row"><span class="field-name">tg_user_id</span><span class="field-desc">Telegram ID — key for linking with Supabase</span><span class="ft-id">id</span></div>
+          <div class="field-row"><span class="field-name">tg_username</span><span class="field-desc">@nickname on Telegram</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">name</span><span class="field-desc">Client's name (entered manually)</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">phone</span><span class="field-desc">Phone number for contact</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">budget</span><span class="field-desc">Client's budget (from questionnaire, Q5)</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">chosen_car</span><span class="field-desc">Chosen car model after recommendations</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">ai_recommendations</span><span class="field-desc">Full text of AI recommendations</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">status</span><span class="field-desc">new / contacted / booked / closed</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">last_followup_at</span><span class="field-desc">Date of the last follow-up message</span><span class="ft-dt">datetime</span></div>
+          <div class="field-row"><span class="field-name">created_at</span><span class="field-desc">Date and time the questionnaire was completed</span><span class="ft-dt">datetime</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="schema-grid">
+
+      <div class="schema-card">
+        <div class="schema-head" style="color:var(--orange)">🌐 Airtable — Site Leads</div>
+        <div class="schema-body">
+          <div class="field-row"><span class="field-name">chat_id</span><span class="field-desc">Telegram ID (if the request comes from the bot)</span><span class="ft-id">id</span></div>
+          <div class="field-row"><span class="field-name">Name</span><span class="field-desc">Name from the website form</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">Phone</span><span class="field-desc">Contact number</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">Convenient time</span><span class="field-desc">When it's convenient — free text</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">Looking for</span><span class="field-desc">Brief description of the client's need</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">Source</span><span class="field-desc">site_form or telegram_bot</span><span class="ft-str">string</span></div>
+        </div>
+      </div>
+
+      <div class="schema-card">
+        <div class="schema-head" style="color:var(--pink)">📸 Airtable — Instagram Posts</div>
+        <div class="schema-body">
+          <div class="field-row"><span class="field-name">Post Text</span><span class="field-desc">Post text generated by GPT</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">Hashtags</span><span class="field-desc">12–15 hashtags (UA + EN)</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">Photo</span><span class="field-desc">Photo URL from Unsplash</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">Status</span><span class="field-desc">draft / published / skipped</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">Published At</span><span class="field-desc">Actual publication date</span><span class="ft-dt">datetime</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ PREVIEW ══════════════════════════════════════════ -->
+<section id="preview">
+  <div class="container">
+    <div class="sec-label">// 04 — PREVIEW</div>
+    <h2 class="sec-title">What the client and the manager see</h2>
+    <p class="sec-sub">On the left — a real dialogue between the client and the bot. On the right — the lead card the manager receives in Telegram.</p>
+
+    <div class="preview-grid">
+      <!-- Phone -->
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="phone-top">
+            <div class="phone-avatar">🚗</div>
+            <div class="phone-info">
+              <div class="phone-name">Car Matching</div>
+              <div class="phone-status">● online</div>
+            </div>
+          </div>
+          <div class="phone-body">
+            <div class="msg from-bot">
+              <div class="bubble">Hi! 👋 I'll help you pick a car that fits your lifestyle — for free. Choose an option:</div>
+              <div class="kbd-row">
+                <span class="kbd-btn">🔍 Help me pick</span>
+                <span class="kbd-btn">✍️ I'll type it myself</span>
+              </div>
+              <div class="bubble-time">10:02</div>
+            </div>
+            <div class="msg from-user">
+              <div class="bubble">🔍 Help me pick</div>
+              <div class="bubble-time">10:02</div>
+            </div>
+            <div class="msg from-bot">
+              <div class="bubble">Which city do you live in? 🏙️</div>
+              <div class="kbd-row">
+                <span class="kbd-btn">Kyiv</span>
+                <span class="kbd-btn">Kharkiv</span>
+                <span class="kbd-btn">Odesa</span>
+                <span class="kbd-btn">Other</span>
+              </div>
+              <div class="bubble-time">10:02</div>
+            </div>
+            <div class="msg from-user">
+              <div class="bubble">Kyiv</div>
+              <div class="bubble-time">10:03</div>
+            </div>
+            <div class="msg from-bot">
+              <div class="bubble">💰 What's your budget? We'll factor in the Kyiv market right away.</div>
+              <div class="kbd-row">
+                <span class="kbd-btn">Up to $5k</span>
+                <span class="kbd-btn">$5–10k</span>
+                <span class="kbd-btn">$10–20k</span>
+                <span class="kbd-btn">&gt;$20k</span>
+              </div>
+              <div class="bubble-time">10:03</div>
+            </div>
+            <div class="msg from-user">
+              <div class="bubble">$10–20k</div>
+              <div class="bubble-time">10:04</div>
+            </div>
+            <div class="msg from-bot">
+              <div class="bubble">🤖 Analyzing your profile... Here are my recommendations for you:<br><br>1. Toyota RAV4 (2019–2021)<br>2. Kia Sportage (2020)<br>3. Hyundai Tucson (2019)</div>
+              <div class="bubble-time">10:05</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manager notification -->
+      <div class="notif-wrap">
+        <div class="notif-label">// Notification to the manager in Telegram</div>
+        <div class="notif-card">
+          <div class="notif-header">🔥 NEW LEAD — CONSULTATION BOOKING</div>
+          <div class="notif-body">
+            <div class="notif-row"><span class="notif-label-inline">👤 Username:</span><span class="notif-val">@oleksiy_k</span></div>
+            <div class="notif-row"><span class="notif-label-inline">📅 Date:</span><span class="notif-val">February 25, 10:07</span></div>
+            <div class="notif-row"><span class="notif-label-inline">📍 Source:</span><span class="notif-val">Telegram bot (questionnaire)</span></div>
+            <div class="notif-divider"></div>
+            <div class="notif-row"><span class="notif-label-inline">👋 Name:</span><span class="notif-val">Oleksiy</span></div>
+            <div class="notif-row"><span class="notif-label-inline">📞 Phone:</span><span class="notif-val">+380 67 *** ** 42</span></div>
+            <div class="notif-divider"></div>
+            <div class="notif-row"><span class="notif-label-inline">💰 Budget:</span><span class="notif-val">$10,000 – $20,000</span></div>
+            <div class="notif-row"><span class="notif-label-inline">🚗 Chose:</span><span class="notif-val">Toyota RAV4 (2019)</span></div>
+            <div class="notif-row"><span class="notif-label-inline">🎯 Purpose:</span><span class="notif-val">Family + out-of-town trips</span></div>
+            <div class="notif-row"><span class="notif-label-inline">⏰ Convenient:</span><span class="notif-val">Weekdays after 18:00</span></div>
+            <div class="notif-divider"></div>
+            <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">🤖 Bot's AI recommendations:</div>
+            <div class="notif-recs">
+              <div class="notif-rec"><span>1.</span> Toyota RAV4 (2019) — reliability, space, Kyiv market</div>
+              <div class="notif-rec"><span>2.</span> Kia Sportage (2020) — cheaper alternative, savings</div>
+              <div class="notif-rec"><span>3.</span> Hyundai Tucson (2019) — price/quality balance</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:8px;">
+          <div class="notif-label">// Follow-up message (automatic)</div>
+          <div class="notif-card">
+            <div class="notif-header" style="color:var(--orange)">📨 FOLLOW-UP — Day 3</div>
+            <div class="notif-body" style="font-size:13.5px; line-height:1.7; color:var(--muted2);">
+              Hi, Oleksiy! 👋<br><br>
+              You were interested in the <strong style="color:var(--text)">Toyota RAV4</strong> with us a few days ago.<br>
+              We found <strong style="color:var(--green)">new listings</strong> in your budget 👀<br><br>
+              Want to see the current options or book a consultation right away?
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SETUP ══════════════════════════════════════════ -->
+<section id="setup">
+  <div class="container">
+    <div class="sec-label">// 05 — LAUNCH</div>
+    <h2 class="sec-title">What's needed to set it up</h2>
+    <p class="sec-sub">Five steps from a blank state to a fully working system.</p>
+
+    <div class="setup-list">
+      <div class="setup-item">
+        <div class="setup-n" style="background:rgba(79,142,247,0.15); color:var(--accent);">1</div>
+        <div class="setup-text"><b>Telegram bot and credentials</b>Create a bot via @BotFather → get the token → add it to n8n as a Telegram credential. Configure the Webhook URL pointing to the n8n instance. This is the entry point for all messages from clients.</div>
+      </div>
+      <div class="setup-item">
+        <div class="setup-n" style="background:rgba(45,212,247,0.12); color:var(--teal);">2</div>
+        <div class="setup-text"><b>Supabase — two tables</b>Create a Supabase project → the sessions table (chat_id, current_step, answers JSON, chosen_car, timestamps) + the site_bookings table. Add the Supabase URL and API key to n8n. Supabase is the bot's operational memory between sessions.</div>
+      </div>
+      <div class="setup-item">
+        <div class="setup-n" style="background:rgba(16,185,129,0.15); color:var(--green);">3</div>
+        <div class="setup-text"><b>Airtable — the CRM base</b>Create a "Car Matching" base → four sheets: Quiz Leads, Free Leads, Site Leads, Instagram Posts. Add an Airtable Personal Access Token to n8n. This is where the manager sees all leads and manages statuses.</div>
+      </div>
+      <div class="setup-item">
+        <div class="setup-n" style="background:rgba(245,158,11,0.15); color:var(--orange);">4</div>
+        <div class="setup-text"><b>External service API keys</b>OpenAI API key (GPT-4o for matching and content generation) + Tavily API key (listing search) + Unsplash Client ID (photos) + ElevenLabs API key (voice assistant on the website). All keys are added to n8n credentials.</div>
+      </div>
+      <div class="setup-item">
+        <div class="setup-n" style="background:rgba(167,139,250,0.15); color:#a78bfa;">5</div>
+        <div class="setup-text"><b>Import workflows and testing</b>Import all 4 JSON files into n8n → activate → do a test run of each workflow. Verify that the bot responds, leads are saved to Airtable and Supabase, and the manager receives notifications.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ RESULTS ══════════════════════════════════════════ -->
+<section id="results">
+  <div class="container">
+    <div class="sec-label">// 06 — RESULT</div>
+    <h2 class="sec-title">What changes after launch</h2>
+    <p class="sec-sub">The system works around the clock — no days off, no delays and no human factor in handling the first contact.</p>
+    <div class="results-grid">
+      <div class="res-card rc-blue">
+        <div class="res-num">0 min</div>
+        <div class="res-desc">Manager's time to process an incoming lead. The system itself collects the data, picks the car and hands over a ready profile.</div>
+      </div>
+      <div class="res-card rc-green">
+        <div class="res-num">24/7</div>
+        <div class="res-desc">The bot, voice assistant and follow-up work without days off. A client at 11 PM gets an answer instantly.</div>
+      </div>
+      <div class="res-card rc-pur">
+        <div class="res-num">4-in-1</div>
+        <div class="res-desc">Telegram bot, website, follow-up and Instagram content — one ecosystem, one dashboard in Airtable.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STACK ══════════════════════════════════════════ -->
+<section id="stack">
+  <div class="container">
+    <div class="sec-label">// 07 — STACK</div>
+    <h2 class="sec-title">Technology under the hood</h2>
+    <p class="sec-sub">Each tool is chosen for a specific task — nothing extra, no compromises.</p>
+    <div class="stack-grid">
+      <div class="stack-card">
+        <div class="stack-icon">⚙️</div>
+        <div class="stack-name">n8n</div>
+        <div class="stack-role">Orchestration</div>
+        <div class="stack-desc">The heart of the system — connects all services, drives the workflow logic and triggers.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">🤖</div>
+        <div class="stack-name">OpenAI GPT-4o</div>
+        <div class="stack-role">AI engine</div>
+        <div class="stack-desc">Analyzes the client's profile, generates recommendations, writes posts and follow-up texts.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">🎙️</div>
+        <div class="stack-name">ElevenLabs</div>
+        <div class="stack-role">Voice assistant</div>
+        <div class="stack-desc">A widget on the website — answers customer questions in a lifelike voice, like a real person.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">🗄️</div>
+        <div class="stack-name">Supabase</div>
+        <div class="stack-role">Session memory</div>
+        <div class="stack-desc">Stores the dialogue state in real time — the bot remembers every client between sessions.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">📋</div>
+        <div class="stack-name">Airtable</div>
+        <div class="stack-role">CRM system</div>
+        <div class="stack-desc">A base of leads and Instagram posts with a convenient interface for the manager.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">✈️</div>
+        <div class="stack-name">Telegram Bot API</div>
+        <div class="stack-role">Communication channel</div>
+        <div class="stack-desc">The main interface for interacting with the client — fast, convenient, no extra apps.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">🔎</div>
+        <div class="stack-name">Tavily Search</div>
+        <div class="stack-role">Listing search</div>
+        <div class="stack-desc">Searches real listings on the car market by the client's parameters in real time.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">📷</div>
+        <div class="stack-name">Unsplash API</div>
+        <div class="stack-role">Photo content</div>
+        <div class="stack-desc">Picks high-quality car photos for cards and Instagram posts — automatically.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══════════════════════════════════════════ -->
+<footer>
+  <div class="footer-logo">// AUTOBOT — AI SALES FUNNEL</div>
+  <div class="footer-tags">
+    <span class="footer-tag">n8n</span>
+    <span class="footer-tag">GPT-4o</span>
+    <span class="footer-tag">ElevenLabs</span>
+    <span class="footer-tag">Supabase</span>
+    <span class="footer-tag">Airtable</span>
+    <span class="footer-tag">Telegram</span>
+    <span class="footer-tag">Tavily</span>
+  </div>
+  <div class="footer-meta">Documentation v1.0 · 2025</div>
+</footer>
+
+<script>
+  // Scroll-triggered fade-in for sections
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.ov-card, .arch-card, .schema-card, .setup-item, .res-card, .stack-card').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.55s ease, transform 0.55s ease, border-color 0.25s, box-shadow 0.25s';
+    observer.observe(el);
+  });
+</script>
+
+</body>
+</html>
