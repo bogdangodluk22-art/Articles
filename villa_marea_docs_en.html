@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Villa Marea — Booking System Docs</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Unbounded:wght@400;700;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #0a0e1a;
+    --bg2:     #0d1220;
+    --card:    #111827;
+    --card2:   #171f35;
+    --accent:  #4f8ef7;
+    --acc2:    #7c3aed;
+    --gold:    #f59e0b;
+    --green:   #10b981;
+    --teal:    #2dd4bf;
+    --pink:    #fb7185;
+    --orange:  #f97316;
+    --border:  rgba(79,142,247,0.14);
+    --border2: rgba(255,255,255,0.06);
+    --text:    #e2e8f0;
+    --muted:   #64748b;
+    --muted2:  #94a3b8;
+    --mono:    'JetBrains Mono', monospace;
+    --head:    'Unbounded', sans-serif;
+    --body:    'Manrope', sans-serif;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{ background:var(--bg); color:var(--text); font-family:var(--body); overflow-x:hidden; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp   { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:.3} }
+  @keyframes gradShift{ 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  @keyframes scanline { 0%{transform:translateY(-100%)} 100%{transform:translateY(100vh)} }
+  @keyframes float    { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+  @keyframes shimmer  { 0%{background-position:-200% center} 100%{background-position:200% center} }
+  @keyframes rotate   { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+  .fade-up{animation:fadeUp .7s ease both}
+  .d1{animation-delay:.1s} .d2{animation-delay:.25s}
+  .d3{animation-delay:.4s} .d4{animation-delay:.55s} .d5{animation-delay:.7s}
+
+  /* ── NAV ── */
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(10,14,26,.88); backdrop-filter:blur(18px);
+    border-bottom:1px solid var(--border);
+    padding:0 48px; height:56px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .nav-logo{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--gold); letter-spacing:.07em;}
+  .nav-links{display:flex; gap:28px;}
+  .nav-links a{font-family:var(--mono); font-size:11px; color:var(--muted); text-decoration:none; letter-spacing:.06em; transition:color .2s; text-transform:uppercase;}
+  .nav-links a:hover{color:var(--text);}
+  @media(max-width:700px){nav{padding:0 20px;} .nav-links{display:none;}}
+
+  /* ── LAYOUT ── */
+  section{padding:96px 48px; border-bottom:1px solid var(--border2);}
+  @media(max-width:700px){section{padding:64px 20px;}}
+  .container{max-width:1100px; margin:0 auto;}
+  .sec-label{font-family:var(--mono); font-size:11px; letter-spacing:.12em; color:var(--gold); text-transform:uppercase; margin-bottom:8px;}
+  .sec-title{font-family:var(--head); font-size:clamp(22px,3.5vw,34px); font-weight:700; margin-bottom:8px; line-height:1.15;}
+  .sec-sub{color:var(--muted2); font-size:15px; line-height:1.65; max-width:680px; margin-bottom:48px;}
+
+  /* ── HERO ── */
+  #hero{
+    min-height:100vh; display:flex; align-items:center;
+    position:relative; overflow:hidden; padding-top:56px;
+    border-bottom:1px solid var(--border2);
+  }
+  .hero-bg{
+    position:absolute; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 70% 55% at 70% -5%, rgba(245,158,11,.12) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 40% at 5% 85%, rgba(79,142,247,.1) 0%, transparent 60%);
+  }
+  .hero-grid{
+    position:absolute; inset:0; pointer-events:none;
+    background-image:
+      linear-gradient(rgba(245,158,11,.035) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(245,158,11,.035) 1px,transparent 1px);
+    background-size:60px 60px;
+  }
+  .hero-scanline{
+    position:absolute; left:0; right:0; height:2px;
+    background:linear-gradient(90deg,transparent,rgba(245,158,11,.18),transparent);
+    animation:scanline 7s linear infinite; pointer-events:none;
+  }
+  .hero-inner{position:relative; z-index:2; max-width:1100px; margin:0 auto; padding:0 48px; width:100%;}
+  @media(max-width:700px){.hero-inner{padding:0 20px;}}
+
+  .hero-badge{
+    display:inline-flex; align-items:center; gap:9px;
+    background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.3);
+    border-radius:4px; padding:5px 14px; margin-bottom:28px;
+    font-family:var(--mono); font-size:11px; color:var(--gold); letter-spacing:.1em;
+  }
+  .hero-dot{width:7px; height:7px; border-radius:50%; background:var(--green); animation:pulse 2s infinite; display:inline-block;}
+  .hero-h1{font-family:var(--head); font-size:clamp(32px,5.5vw,66px); font-weight:900; line-height:1.04; letter-spacing:-.02em; margin-bottom:24px;}
+  .hero-h1 em{font-style:normal; color:var(--gold);}
+  .hero-sub{font-size:clamp(15px,1.8vw,18px); color:var(--muted2); line-height:1.7; max-width:640px; margin-bottom:36px;}
+  .hero-meta{display:flex; gap:10px; flex-wrap:wrap;}
+  .hero-tag{font-family:var(--mono); font-size:11px; padding:4px 12px; border-radius:4px; border:1px solid; letter-spacing:.04em;}
+  .ht-gold {color:var(--gold);   border-color:rgba(245,158,11,.35); background:rgba(245,158,11,.07);}
+  .ht-blue {color:var(--accent); border-color:rgba(79,142,247,.35);  background:rgba(79,142,247,.07);}
+  .ht-green{color:var(--green);  border-color:rgba(16,185,129,.35);  background:rgba(16,185,129,.07);}
+  .ht-teal {color:var(--teal);   border-color:rgba(45,212,191,.35);  background:rgba(45,212,191,.07);}
+  .ht-pur  {color:#a78bfa;       border-color:rgba(167,139,250,.35); background:rgba(167,139,250,.07);}
+
+  .hero-scroll{
+    position:absolute; bottom:32px; left:50%; transform:translateX(-50%);
+    font-family:var(--mono); font-size:10px; color:var(--muted); letter-spacing:.1em;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    animation:float 3s ease-in-out infinite;
+  }
+  .hero-scroll::after{content:''; width:1px; height:32px; background:linear-gradient(var(--muted),transparent);}
+
+  /* ── OVERVIEW ── */
+  .overview-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media(max-width:700px){.overview-grid{grid-template-columns:1fr;}}
+  .ov-card{
+    background:var(--card); border:1px solid var(--border2);
+    border-radius:14px; padding:28px; position:relative; overflow:hidden;
+    transition:border-color .25s, transform .25s; cursor:default;
+  }
+  .ov-card:hover{transform:translateY(-3px);}
+  .ov-card::before{content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:14px 14px 0 0;}
+  .ov-card.c-gold::before  {background:linear-gradient(90deg,var(--gold),var(--orange));}
+  .ov-card.c-blue::before  {background:linear-gradient(90deg,var(--accent),var(--acc2));}
+  .ov-card.c-green::before {background:linear-gradient(90deg,var(--green),var(--teal));}
+  .ov-card.c-pur::before   {background:linear-gradient(90deg,var(--acc2),var(--pink));}
+  .ov-card:hover.c-gold  {border-color:rgba(245,158,11,.45);}
+  .ov-card:hover.c-blue  {border-color:rgba(79,142,247,.45);}
+  .ov-card:hover.c-green {border-color:rgba(16,185,129,.45);}
+  .ov-card:hover.c-pur   {border-color:rgba(167,139,250,.45);}
+  .ov-icon{font-size:28px; margin-bottom:14px;}
+  .ov-name{font-family:var(--head); font-size:15px; font-weight:700; margin-bottom:8px;}
+  .ov-desc{font-size:14px; color:var(--muted2); line-height:1.6;}
+
+  /* ── WOW ── */
+  #wow{background:var(--bg2);}
+  .wow-box{
+    border-radius:20px; padding:56px 48px; position:relative; overflow:hidden;
+    background:var(--card); border:1px solid transparent; background-clip:padding-box;
+  }
+  .wow-box::before{
+    content:''; position:absolute; inset:-2px; border-radius:22px; z-index:-1;
+    background:linear-gradient(135deg,var(--gold),var(--orange),var(--acc2),var(--gold));
+    background-size:300% 300%; animation:gradShift 5s ease infinite;
+  }
+  .wow-label{font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; margin-bottom:16px;}
+  .wow-text{font-family:var(--head); font-size:clamp(24px,4vw,48px); font-weight:900; line-height:1.1;}
+  .wow-text em{font-style:normal; color:var(--gold);}
+  .wow-sub{margin-top:16px; font-size:16px; color:var(--muted2); max-width:560px; line-height:1.6;}
+  .wow-glow{position:absolute; top:-60px; right:-60px; width:300px; height:300px; border-radius:50%; pointer-events:none; background:radial-gradient(circle,rgba(245,158,11,.16) 0%,transparent 70%);}
+
+  /* ── ARCHITECTURE ── */
+  .arch-flow{display:flex; flex-direction:column; gap:0;}
+  .arch-step{display:grid; grid-template-columns:64px 1fr; gap:0 24px; position:relative;}
+  .arch-left{display:flex; flex-direction:column; align-items:center;}
+  .arch-num{
+    width:56px; height:56px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:14px; font-weight:700;
+    flex-shrink:0; position:relative; z-index:1;
+    transition:transform .25s;
+  }
+  .arch-step:hover .arch-num{transform:scale(1.08);}
+  .arch-line{width:2px; flex:1; min-height:20px; background:var(--border);}
+  .arch-step:last-child .arch-line{display:none;}
+  .arch-body{padding-bottom:36px;}
+  .arch-card{
+    background:var(--card); border:1px solid var(--border2);
+    border-radius:12px; padding:22px 26px;
+    transition:border-color .25s, transform .25s;
+  }
+  .arch-card:hover{transform:translateX(4px);}
+  .arch-title{font-weight:700; font-size:15px; margin-bottom:6px;}
+  .arch-desc{color:var(--muted2); font-size:13.5px; line-height:1.65;}
+  .arch-hint{
+    display:flex; align-items:flex-start; gap:8px;
+    background:rgba(255,255,255,.04); border-radius:8px;
+    padding:10px 14px; margin-top:12px;
+    font-size:13px; color:var(--muted); line-height:1.55;
+  }
+  .arch-tags{display:flex; gap:6px; flex-wrap:wrap; margin-top:12px;}
+  .atag{font-family:var(--mono); font-size:10px; padding:3px 10px; border-radius:4px; border:1px solid; letter-spacing:.02em;}
+  .at-gold {color:var(--gold);   border-color:rgba(245,158,11,.3);  background:rgba(245,158,11,.07);}
+  .at-blue {color:var(--accent); border-color:rgba(79,142,247,.3);  background:rgba(79,142,247,.07);}
+  .at-green{color:var(--green);  border-color:rgba(16,185,129,.3);  background:rgba(16,185,129,.07);}
+  .at-pur  {color:#a78bfa;       border-color:rgba(167,139,250,.3); background:rgba(167,139,250,.07);}
+  .at-teal {color:var(--teal);   border-color:rgba(45,212,191,.3);  background:rgba(45,212,191,.07);}
+  .at-pink {color:var(--pink);   border-color:rgba(251,113,133,.3); background:rgba(251,113,133,.07);}
+
+  .n1{background:rgba(245,158,11,.15);  color:var(--gold);}
+  .n2{background:rgba(79,142,247,.15);  color:var(--accent);}
+  .n3{background:rgba(167,139,250,.15); color:#a78bfa;}
+  .n4{background:rgba(16,185,129,.15);  color:var(--green);}
+  .n5{background:rgba(45,212,191,.15);  color:var(--teal);}
+  .n6{background:rgba(251,113,133,.15); color:var(--pink);}
+
+  .arch-card.step-gold  {border-left:3px solid var(--gold);}
+  .arch-card.step-blue  {border-left:3px solid var(--accent);}
+  .arch-card.step-pur   {border-left:3px solid #a78bfa;}
+  .arch-card.step-green {border-left:3px solid var(--green);}
+  .arch-card.step-teal  {border-left:3px solid var(--teal);}
+  .arch-card.step-pink  {border-left:3px solid var(--pink);}
+
+  /* ── DATA SCHEMA ── */
+  .schema-grid{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  @media(max-width:900px){.schema-grid{grid-template-columns:1fr;}}
+  .schema-card{background:var(--card); border:1px solid var(--border2); border-radius:12px; overflow:hidden;}
+  .schema-head{padding:14px 20px; border-bottom:1px solid var(--border2); font-family:var(--mono); font-size:12px; font-weight:700; display:flex; align-items:center; gap:8px;}
+  .schema-body{padding:6px 0;}
+  .field-row{
+    display:grid; grid-template-columns:180px 1fr 80px;
+    align-items:center; gap:12px;
+    padding:10px 20px; border-bottom:1px solid rgba(255,255,255,.035);
+    font-size:12.5px;
+  }
+  .field-row:last-child{border-bottom:none;}
+  .field-name{font-family:var(--mono); font-size:12px; color:var(--gold);}
+  .field-desc{color:var(--muted2); font-size:12px;}
+  .ft-str {font-family:var(--mono); font-size:10px; padding:2px 8px; border-radius:3px; color:var(--accent); border:1px solid rgba(79,142,247,.3); background:rgba(79,142,247,.07);}
+  .ft-dt  {font-family:var(--mono); font-size:10px; padding:2px 8px; border-radius:3px; color:var(--green);  border:1px solid rgba(16,185,129,.3);  background:rgba(16,185,129,.07);}
+  .ft-id  {font-family:var(--mono); font-size:10px; padding:2px 8px; border-radius:3px; color:var(--gold);   border:1px solid rgba(245,158,11,.3);  background:rgba(245,158,11,.07);}
+  .ft-bool{font-family:var(--mono); font-size:10px; padding:2px 8px; border-radius:3px; color:var(--teal);   border:1px solid rgba(45,212,191,.3);  background:rgba(45,212,191,.07);}
+
+  /* ── PREVIEW ── */
+  #preview{background:var(--bg2);}
+  .preview-grid{display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:start;}
+  @media(max-width:800px){.preview-grid{grid-template-columns:1fr;}}
+
+  /* Website mockup */
+  .site-wrap{display:flex; justify-content:center;}
+  .site-mock{
+    width:100%; max-width:460px; background:#0d1117; border-radius:12px;
+    border:1px solid rgba(255,255,255,.1);
+    box-shadow:0 32px 64px rgba(0,0,0,.5);
+    overflow:hidden;
+  }
+  .site-bar{
+    background:#111827; padding:10px 16px;
+    display:flex; align-items:center; gap:10px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .site-dots{display:flex; gap:5px;}
+  .site-dots span{width:11px; height:11px; border-radius:50%;}
+  .site-dots .r{background:#ef4444;} .site-dots .y{background:#f59e0b;} .site-dots .g{background:#10b981;}
+  .site-url{flex:1; background:rgba(255,255,255,.06); border-radius:4px; padding:3px 10px; font-family:var(--mono); font-size:10px; color:var(--muted);}
+  .site-body{padding:0; background:#0a0f1e; min-height:420px;}
+
+  /* mini site */
+  .mini-hero{
+    background:linear-gradient(135deg,rgba(10,14,26,.97),rgba(17,24,39,.97));
+    padding:24px; text-align:center; position:relative; overflow:hidden;
+  }
+  .mini-hero::before{content:''; position:absolute; inset:0; background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(245,158,11,.1),transparent); pointer-events:none;}
+  .mini-logo{font-family:var(--head); font-size:18px; font-weight:900; color:var(--gold); margin-bottom:4px;}
+  .mini-sub{font-family:var(--mono); font-size:9px; color:var(--muted); letter-spacing:.08em;}
+
+  .mini-chat{
+    margin:16px; background:var(--card2); border:1px solid var(--border2);
+    border-radius:10px; overflow:hidden;
+  }
+  .mini-chat-head{
+    background:rgba(245,158,11,.1); border-bottom:1px solid var(--border2);
+    padding:8px 14px; display:flex; align-items:center; gap:8px;
+  }
+  .mini-chat-avatar{width:24px; height:24px; border-radius:50%; background:linear-gradient(135deg,var(--gold),var(--orange)); display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0;}
+  .mini-chat-info .mini-name{font-size:12px; font-weight:700;}
+  .mini-chat-info .mini-status{font-size:10px; color:var(--green);}
+  .mini-chat-body{padding:12px; display:flex; flex-direction:column; gap:8px; min-height:250px;}
+
+  .mini-msg{display:flex; flex-direction:column; max-width:88%;}
+  .mini-msg.bot{align-self:flex-start;}
+  .mini-msg.usr{align-self:flex-end;}
+  .mini-bubble{padding:8px 12px; border-radius:12px; font-size:12px; line-height:1.5;}
+  .bot .mini-bubble{background:#1c3a5e; border-bottom-left-radius:3px; color:var(--text);}
+  .usr .mini-bubble{background:#2b5278; border-bottom-right-radius:3px; color:var(--text);}
+  .mini-time{font-size:9px; color:var(--muted); margin-top:2px; align-self:flex-end; font-family:var(--mono);}
+  .bot .mini-time{align-self:flex-start;}
+  .mini-kbd{display:flex; flex-wrap:wrap; gap:4px; margin-top:3px;}
+  .mini-btn{background:rgba(245,158,11,.12); border:1px solid rgba(245,158,11,.3); border-radius:6px; padding:4px 8px; font-size:10px; color:var(--gold);}
+
+  /* Manager panel */
+  .panel-wrap{display:flex; flex-direction:column; gap:14px;}
+  .panel-label{font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-bottom:4px;}
+  .panel-card{background:var(--card); border:1px solid var(--border2); border-radius:12px; overflow:hidden;}
+  .panel-head{
+    background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(124,58,237,.1));
+    padding:12px 16px; border-bottom:1px solid var(--border2);
+    font-family:var(--mono); font-size:12px; font-weight:700; color:var(--gold);
+  }
+  .panel-body{padding:14px 16px; font-size:13px; line-height:1.8;}
+  .panel-row{display:flex; gap:8px; margin-bottom:2px;}
+  .panel-lbl{color:var(--muted); min-width:130px;}
+  .panel-val{color:var(--text); font-weight:600;}
+  .panel-div{height:1px; background:var(--border2); margin:10px 0;}
+  .status-badge{
+    display:inline-block; font-family:var(--mono); font-size:10px;
+    padding:2px 10px; border-radius:3px;
+    color:var(--green); border:1px solid rgba(16,185,129,.3); background:rgba(16,185,129,.07);
+  }
+  .status-wait{color:var(--gold); border-color:rgba(245,158,11,.3); background:rgba(245,158,11,.07);}
+
+  /* Dashboard mockup */
+  .dash-card{background:var(--card); border:1px solid var(--border2); border-radius:12px; overflow:hidden; margin-top:14px;}
+  .dash-head{
+    background:rgba(79,142,247,.08); border-bottom:1px solid var(--border2);
+    padding:10px 16px; font-family:var(--mono); font-size:11px; font-weight:700; color:var(--accent);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .table-mock{width:100%; border-collapse:collapse; font-size:12px;}
+  .table-mock th{
+    padding:8px 12px; text-align:left; font-family:var(--mono); font-size:10px;
+    color:var(--muted); border-bottom:1px solid var(--border2); font-weight:600; letter-spacing:.05em;
+  }
+  .table-mock td{padding:9px 12px; border-bottom:1px solid rgba(255,255,255,.03); color:var(--muted2); font-size:12px;}
+  .table-mock tr:last-child td{border-bottom:none;}
+  .table-mock tr:hover td{background:rgba(255,255,255,.02);}
+  .badge-free{font-family:var(--mono); font-size:9px; padding:2px 7px; border-radius:3px; color:var(--green); border:1px solid rgba(16,185,129,.3); background:rgba(16,185,129,.07);}
+  .badge-book{font-family:var(--mono); font-size:9px; padding:2px 7px; border-radius:3px; color:var(--gold);  border:1px solid rgba(245,158,11,.3); background:rgba(245,158,11,.07);}
+  .badge-pend{font-family:var(--mono); font-size:9px; padding:2px 7px; border-radius:3px; color:var(--accent);border:1px solid rgba(79,142,247,.3); background:rgba(79,142,247,.07);}
+
+  /* ── SETUP ── */
+  .setup-list{display:flex; flex-direction:column; gap:14px;}
+  .setup-item{
+    display:flex; gap:16px; align-items:flex-start;
+    background:var(--card); border:1px solid var(--border2);
+    border-radius:12px; padding:20px 24px;
+    transition:border-color .25s, transform .25s;
+  }
+  .setup-item:hover{border-color:rgba(245,158,11,.35); transform:translateX(4px);}
+  .setup-n{
+    width:32px; height:32px; border-radius:8px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:13px; font-weight:700;
+  }
+  .setup-text b{color:var(--text); font-size:14px; display:block; margin-bottom:4px;}
+  .setup-text{color:var(--muted2); font-size:13.5px; line-height:1.55;}
+
+  /* ── RESULTS ── */
+  #results{background:var(--bg2);}
+  .results-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+  @media(max-width:700px){.results-grid{grid-template-columns:1fr;}}
+  .res-card{
+    background:var(--card); border:1px solid var(--border2);
+    border-radius:14px; padding:32px 24px; text-align:center;
+    transition:transform .25s, border-color .25s;
+  }
+  .res-card:hover{transform:translateY(-4px);}
+  .res-card.rc-gold:hover {border-color:rgba(245,158,11,.4);}
+  .res-card.rc-green:hover{border-color:rgba(16,185,129,.4);}
+  .res-card.rc-blue:hover {border-color:rgba(79,142,247,.4);}
+  .res-num{font-family:var(--head); font-size:clamp(32px,4.5vw,52px); font-weight:900; line-height:1; margin-bottom:10px;}
+  .rc-gold  .res-num{color:var(--gold);}
+  .rc-green .res-num{color:var(--green);}
+  .rc-blue  .res-num{color:var(--accent);}
+  .res-desc{font-size:14px; color:var(--muted2); line-height:1.55;}
+
+  /* ── STACK ── */
+  .stack-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px;}
+  .stack-card{
+    background:var(--card); border:1px solid var(--border2);
+    border-radius:12px; padding:20px 22px;
+    transition:transform .25s, border-color .25s;
+  }
+  .stack-card:hover{transform:translateY(-3px); border-color:rgba(245,158,11,.35);}
+  .stack-icon{font-size:26px; margin-bottom:10px;}
+  .stack-name{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--gold); margin-bottom:4px;}
+  .stack-role{font-size:12px; color:var(--orange); font-family:var(--mono); margin-bottom:6px;}
+  .stack-desc{font-size:13px; color:var(--muted2); line-height:1.5;}
+
+  /* ── FOOTER ── */
+  footer{
+    background:#060912; border-top:1px solid var(--border);
+    padding:36px 48px;
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
+  }
+  @media(max-width:700px){footer{padding:28px 20px;}}
+  .footer-logo{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--gold);}
+  .footer-meta{font-family:var(--mono); font-size:11px; color:var(--muted);}
+  .footer-tags{display:flex; gap:8px; flex-wrap:wrap;}
+  .footer-tag{font-family:var(--mono); font-size:10px; padding:3px 10px; border-radius:3px; color:var(--muted); border:1px solid var(--border); background:rgba(255,255,255,.02);}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">// VILLA MAREA — BOOKING SYSTEM</div>
+  <div class="nav-links">
+    <a href="#overview">Overview</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#data">Data</a>
+    <a href="#preview">Preview</a>
+    <a href="#setup">Launch</a>
+    <a href="#stack">Stack</a>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-scanline"></div>
+  <div class="hero-inner">
+    <div class="hero-badge fade-up d1">
+      <span class="hero-dot"></span>
+      // VILLA MAREA — AI BOOKING SYSTEM
+    </div>
+    <h1 class="hero-h1 fade-up d2">Reserve a table<br><em>without calls.</em><br>Without waiting.</h1>
+    <p class="hero-sub fade-up d3">A fully automated booking system for a premium restaurant: an AI agent takes requests through the website and a voice widget, checks table availability in real time and confirms reservations — without an administrator involved.</p>
+    <div class="hero-meta fade-up d4">
+      <span class="hero-tag ht-gold">n8n Workflow</span>
+      <span class="hero-tag ht-blue">Claude AI Agent</span>
+      <span class="hero-tag ht-teal">Airtable</span>
+      <span class="hero-tag ht-pur">ElevenLabs Voice</span>
+      <span class="hero-tag ht-green">Base44</span>
+    </div>
+  </div>
+  <div class="hero-scroll fade-up d5">SCROLL</div>
+</section>
+
+<!-- ══ OVERVIEW ══ -->
+<section id="overview">
+  <div class="container">
+    <div class="sec-label">// 01 — OVERVIEW</div>
+    <h2 class="sec-title">What the system does</h2>
+    <p class="sec-sub">Four key modules that turn any guest request into a confirmed reservation — around the clock and without the human factor.</p>
+    <div class="overview-grid">
+      <div class="ov-card c-gold">
+        <div class="ov-icon">🎙️</div>
+        <div class="ov-name">Voice + text AI agent</div>
+        <div class="ov-desc">The guest talks to the agent by voice or text right on the restaurant's website. Claude understands free-form requests — "a table for two on Saturday evening" — and holds the conversation in natural language.</div>
+      </div>
+      <div class="ov-card c-blue">
+        <div class="ov-icon">📅</div>
+        <div class="ov-name">Real-time availability check</div>
+        <div class="ov-desc">The system instantly checks Airtable: which tables are free for the requested date and time, which zone — terrace, main hall or VIP. If a table is taken, it offers an alternative.</div>
+      </div>
+      <div class="ov-card c-green">
+        <div class="ov-icon">🍽️</div>
+        <div class="ov-name">Menu pre-order</div>
+        <div class="ov-desc">The guest can pre-order dishes right in the chat — the agent knows the full menu, can recommend dishes and answer questions about ingredients and allergens.</div>
+      </div>
+      <div class="ov-card c-pur">
+        <div class="ov-icon">📊</div>
+        <div class="ov-name">Real-time manager dashboard</div>
+        <div class="ov-desc">A separate web interface for the administrator: a floor plan with the live status of every table, a list of all reservations for the day, status management — everything pulled from Airtable.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ WOW BANNER ══ -->
+<section id="wow" style="padding:64px 48px;">
+  <div class="container">
+    <div class="wow-box">
+      <div class="wow-glow"></div>
+      <div class="wow-label">// the system's core value</div>
+      <div class="wow-text">⚡ From request to <em>confirmed reservation</em> — less than 2 minutes. 24/7</div>
+      <div class="wow-sub">The guest wrote or spoke — the system checked, recorded and confirmed. The administrator never picked up the phone. Not a single missed reservation — even at 3 AM on a weekend.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ ARCHITECTURE ══ -->
+<section id="architecture">
+  <div class="container">
+    <div class="sec-label">// 02 — ARCHITECTURE</div>
+    <h2 class="sec-title">How it works — the full flow</h2>
+    <p class="sec-sub">The path from the guest's first word to a record in the database and a notification to the manager. Every step is automatic.</p>
+
+    <div class="arch-flow">
+
+      <div class="arch-step">
+        <div class="arch-left">
+          <div class="arch-num n1">01</div>
+          <div class="arch-line"></div>
+        </div>
+        <div class="arch-body">
+          <div class="arch-card step-gold">
+            <div class="arch-title">🌐 Entry point — the restaurant's website</div>
+            <div class="arch-desc">The guest visits the Villa Marea website (Base44). In the corner — a chat widget with two modes: text chat or a voice call via ElevenLabs. First contact happens without an administrator — the agent is always online.</div>
+            <div class="arch-hint">💡 Voice mode uses ElevenLabs Conversational AI — a natural, lifelike voice, not synthetic TTS. The guest can simply speak, as if on the phone.</div>
+            <div class="arch-tags">
+              <span class="atag at-gold">ElevenLabs Voice Widget</span>
+              <span class="atag at-blue">Base44 Website</span>
+              <span class="atag at-teal">Chat Interface</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-left">
+          <div class="arch-num n2">02</div>
+          <div class="arch-line"></div>
+        </div>
+        <div class="arch-body">
+          <div class="arch-card step-blue">
+            <div class="arch-title">🧠 The AI agent receives the request and detects intent</div>
+            <div class="arch-desc">The guest's request (text or voice transcript) arrives via a Webhook to n8n. The Claude API analyzes the message: it determines the request type — a new reservation, a cancellation, a pre-order, or a status check. The agent maintains the conversation context and clarifies details if something is missing.</div>
+            <div class="arch-hint">💡 A Switch router in n8n distributes requests into 4 independent workflow branches: new reservation (Site / Agent), cancellation, menu pre-order, availability check.</div>
+            <div class="arch-tags">
+              <span class="atag at-blue">Claude API (Anthropic)</span>
+              <span class="atag at-pur">n8n Webhook</span>
+              <span class="atag at-gold">Switch Router (4 outputs)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-left">
+          <div class="arch-num n3">03</div>
+          <div class="arch-line"></div>
+        </div>
+        <div class="arch-body">
+          <div class="arch-card step-pur">
+            <div class="arch-title">🔍 Table availability check</div>
+            <div class="arch-desc">n8n makes a search query to the RESERVATIONS table in Airtable — looking up all reservations for the given date and time slot (1.5 hours). A code node analyzes the response: which of the 10 tables are free, which zone fits the number of guests. T01–T05 are for 1–2 guests, T06–T10 are for 3–5 guests.</div>
+            <div class="arch-hint">💡 Booking slots are fixed: 12:00, 13:30, 15:00, 16:30, 18:00, 19:30, 21:00. The system automatically determines the correct slot based on the guest's preferred time.</div>
+            <div class="arch-tags">
+              <span class="atag at-teal">Airtable: Search RESERVATIONS</span>
+              <span class="atag at-pur">n8n Code Node</span>
+              <span class="atag at-blue">Switch: Is Available</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-left">
+          <div class="arch-num n4">04</div>
+          <div class="arch-line"></div>
+        </div>
+        <div class="arch-body">
+          <div class="arch-card step-green">
+            <div class="arch-title">✅ Creating or updating a reservation</div>
+            <div class="arch-desc">If the table is free — n8n checks whether a record already exists for this guest (by phone number). If not — it creates a new row in Airtable with all the details. If the guest is already in the database — it updates the existing record (upsert logic). The status is set to "Pending confirmation".</div>
+            <div class="arch-tags">
+              <span class="atag at-green">Airtable: Create Booking</span>
+              <span class="atag at-blue">Airtable: Update Booking</span>
+              <span class="atag at-gold">Airtable: Find by Phone</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-left">
+          <div class="arch-num n5">05</div>
+          <div class="arch-line"></div>
+        </div>
+        <div class="arch-body">
+          <div class="arch-card step-teal">
+            <div class="arch-title">🍽️ Menu pre-order (optional)</div>
+            <div class="arch-desc">After the table is confirmed, the agent offers to place a pre-order. The guest can choose dishes from the full Villa Marea menu — Claude knows all the items, prices and ingredients. The order is linked to the reservation through the Pre-Order field in Airtable.</div>
+            <div class="arch-hint">💡 Pre-order is a separate workflow branch (Telegram Pre-Order). It is stored in the reservation field and is available to the administrator in the dashboard before the guest arrives.</div>
+            <div class="arch-tags">
+              <span class="atag at-teal">n8n: Pre-Order Branch</span>
+              <span class="atag at-blue">Airtable: Update Pre-Order</span>
+              <span class="atag at-gold">Claude: Menu Knowledge</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-left">
+          <div class="arch-num n6">06</div>
+          <div class="arch-line"></div>
+        </div>
+        <div class="arch-body">
+          <div class="arch-card step-pink">
+            <div class="arch-title">📲 Confirmation to the guest + notification to the manager</div>
+            <div class="arch-desc">The guest receives a confirmation with the reservation details right in the chat — table, zone, time, date. At the same time, the manager receives a Telegram notification with the full summary: guest name, phone, table, time, number of guests and the pre-order if any. The manager's dashboard (Base44) updates in real time.</div>
+            <div class="arch-tags">
+              <span class="atag at-pink">Telegram: New Booking 🟢</span>
+              <span class="atag at-blue">n8n: Voice Summary</span>
+              <span class="atag at-teal">Base44: Manager Dashboard</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ DATA ══ -->
+<section id="data">
+  <div class="container">
+    <div class="sec-label">// 03 — DATA</div>
+    <h2 class="sec-title">What is stored and where</h2>
+    <p class="sec-sub">A single database — Airtable RESERVATIONS. One row = one reservation. All the data is available to the manager through the dashboard in real time.</p>
+
+    <div class="schema-grid" style="margin-bottom:20px;">
+
+      <div class="schema-card">
+        <div class="schema-head" style="color:var(--gold)">📋 Airtable — RESERVATIONS (main fields)</div>
+        <div class="schema-body">
+          <div class="field-row"><span class="field-name">guest_name</span><span class="field-desc">Guest's name — entered during booking</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">phone</span><span class="field-desc">Phone number — key for lookup and upsert</span><span class="ft-id">id</span></div>
+          <div class="field-row"><span class="field-name">table_id</span><span class="field-desc">Table number: T01–T10</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">zone</span><span class="field-desc">Zone: Terrace / Main Hall / VIP</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">date</span><span class="field-desc">Reservation date</span><span class="ft-dt">datetime</span></div>
+          <div class="field-row"><span class="field-name">time_slot</span><span class="field-desc">Time slot: 12:00–13:30, 13:30–15:00, etc.</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">guests_count</span><span class="field-desc">Number of guests (1–5)</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">status</span><span class="field-desc">Free / Pending / Booked / Cancelled / Visited / No-show</span><span class="ft-str">string</span></div>
+        </div>
+      </div>
+
+      <div class="schema-card">
+        <div class="schema-head" style="color:var(--teal)">📋 Airtable — RESERVATIONS (additional fields)</div>
+        <div class="schema-body">
+          <div class="field-row"><span class="field-name">pre_order</span><span class="field-desc">Pre-ordered dishes from the menu</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">special_notes</span><span class="field-desc">Special requests: allergies, occasion, high chair</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">source</span><span class="field-desc">Booking channel: site / agent / voice</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">created_at</span><span class="field-desc">Date and time the reservation was created</span><span class="ft-dt">datetime</span></div>
+          <div class="field-row"><span class="field-name">confirmed_at</span><span class="field-desc">Date confirmed by the administrator</span><span class="ft-dt">datetime</span></div>
+          <div class="field-row"><span class="field-name">cancelled_at</span><span class="field-desc">Cancellation date (if cancelled)</span><span class="ft-dt">datetime</span></div>
+          <div class="field-row"><span class="field-name">cancel_reason</span><span class="field-desc">Cancellation reason (optional)</span><span class="ft-str">string</span></div>
+          <div class="field-row"><span class="field-name">is_cancelled</span><span class="field-desc">Boolean flag for filtering cancelled ones</span><span class="ft-bool">bool</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Tables -->
+    <div class="schema-grid">
+      <div class="schema-card">
+        <div class="schema-head" style="color:var(--accent)">🪑 Tables — Terrace (T01–T05)</div>
+        <div class="schema-body">
+          <div class="field-row"><span class="field-name">T01, T02</span><span class="field-desc">By the window · 2 seats · Terrace</span><span class="ft-str">2 ppl</span></div>
+          <div class="field-row"><span class="field-name">T03, T04</span><span class="field-desc">Center of the hall · 2 seats · Terrace</span><span class="ft-str">2 ppl</span></div>
+          <div class="field-row"><span class="field-name">T05</span><span class="field-desc">Terrace · panoramic view of the Dnipro</span><span class="ft-str">2 ppl</span></div>
+        </div>
+      </div>
+      <div class="schema-card">
+        <div class="schema-head" style="color:var(--green)">🪑 Tables — Hall and VIP (T06–T10)</div>
+        <div class="schema-body">
+          <div class="field-row"><span class="field-name">T06, T07</span><span class="field-desc">Terrace · large table · for a group</span><span class="ft-str">5 ppl</span></div>
+          <div class="field-row"><span class="field-name">T08</span><span class="field-desc">Center of the hall · by the open kitchen</span><span class="ft-str">5 ppl</span></div>
+          <div class="field-row"><span class="field-name">T09, T10</span><span class="field-desc">VIP zone · separate · for events</span><span class="ft-str">5 ppl</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ PREVIEW ══ -->
+<section id="preview">
+  <div class="container">
+    <div class="sec-label">// 04 — PREVIEW</div>
+    <h2 class="sec-title">What the guest and the manager see</h2>
+    <p class="sec-sub">On the left — a real dialogue between the guest and the AI agent on the website. On the right — the administrator's panel and the Telegram notification.</p>
+
+    <div class="preview-grid">
+
+      <!-- Website mockup -->
+      <div class="site-wrap">
+        <div class="site-mock">
+          <div class="site-bar">
+            <div class="site-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+            <div class="site-url">villamarea.ua/booking</div>
+          </div>
+          <div class="site-body">
+            <div class="mini-hero">
+              <div class="mini-logo">Villa Marea</div>
+              <div class="mini-sub">MEDITERRANEAN CUISINE · DNIPRO EMBANKMENT</div>
+            </div>
+            <div class="mini-chat">
+              <div class="mini-chat-head">
+                <div class="mini-chat-avatar">🍋</div>
+                <div class="mini-chat-info">
+                  <div class="mini-name">Villa Marea Assistant</div>
+                  <div class="mini-status">● online</div>
+                </div>
+              </div>
+              <div class="mini-chat-body">
+                <div class="mini-msg bot">
+                  <div class="mini-bubble">Welcome to Villa Marea! 🌊 I'll help you book a table or answer questions about the menu. What are you interested in?</div>
+                  <div class="mini-kbd">
+                    <span class="mini-btn">📅 Book a table</span>
+                    <span class="mini-btn">🍽️ View the menu</span>
+                  </div>
+                  <div class="mini-time">19:12</div>
+                </div>
+                <div class="mini-msg usr">
+                  <div class="mini-bubble">I'd like a table for two, Friday at 19:30</div>
+                  <div class="mini-time">19:13</div>
+                </div>
+                <div class="mini-msg bot">
+                  <div class="mini-bubble">Great! Friday, slot 19:30–21:00 🕖<br><br>Free tables available:<br>• T02 — by the window, terrace 🌿<br>• T04 — center of the hall<br><br>Which would you like?</div>
+                  <div class="mini-time">19:13</div>
+                </div>
+                <div class="mini-msg usr">
+                  <div class="mini-bubble">By the window, please</div>
+                  <div class="mini-time">19:14</div>
+                </div>
+                <div class="mini-msg bot">
+                  <div class="mini-bubble">✅ Table T02 is booked!<br><br>Your name and phone for confirmation?</div>
+                  <div class="mini-time">19:14</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manager panel -->
+      <div class="panel-wrap">
+        <div class="panel-label">// Telegram — notification to the manager</div>
+        <div class="panel-card">
+          <div class="panel-head">🟢 NEW RESERVATION — Villa Marea</div>
+          <div class="panel-body">
+            <div class="panel-row"><span class="panel-lbl">📅 Date:</span><span class="panel-val">Friday, March 14</span></div>
+            <div class="panel-row"><span class="panel-lbl">🕖 Time:</span><span class="panel-val">19:30 — 21:00</span></div>
+            <div class="panel-row"><span class="panel-lbl">🪑 Table:</span><span class="panel-val">T02 · By the window · Terrace</span></div>
+            <div class="panel-div"></div>
+            <div class="panel-row"><span class="panel-lbl">👤 Name:</span><span class="panel-val">Andriy Kovalenko</span></div>
+            <div class="panel-row"><span class="panel-lbl">📞 Phone:</span><span class="panel-val">+380 67 *** ** 88</span></div>
+            <div class="panel-row"><span class="panel-lbl">👥 Guests:</span><span class="panel-val">2 people</span></div>
+            <div class="panel-div"></div>
+            <div class="panel-row"><span class="panel-lbl">🍽️ Pre-order:</span><span class="panel-val">Burrata with tomatoes, Orzo pasta</span></div>
+            <div class="panel-row"><span class="panel-lbl">📌 Status:</span><span class="status-badge status-wait">Pending confirmation</span></div>
+          </div>
+        </div>
+
+        <div class="panel-label" style="margin-top:8px;">// Manager dashboard — floor plan (Base44)</div>
+        <div class="dash-card">
+          <div class="dash-head">
+            <span>📊 Tables · Friday 03/14 · 19:30</span>
+            <span style="color:var(--green); font-size:10px;">● live</span>
+          </div>
+          <table class="table-mock">
+            <thead>
+              <tr><th>Table</th><th>Zone</th><th>Guest</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>T01</td><td>Terrace</td><td>—</td><td><span class="badge-free">Free</span></td></tr>
+              <tr><td>T02</td><td>Terrace</td><td>Andriy K.</td><td><span class="badge-pend">Pending</span></td></tr>
+              <tr><td>T03</td><td>Center</td><td>—</td><td><span class="badge-free">Free</span></td></tr>
+              <tr><td>T06</td><td>Terrace</td><td>Yaroslava</td><td><span class="badge-book">Booked</span></td></tr>
+              <tr><td>T09</td><td>VIP</td><td>—</td><td><span class="badge-free">Free</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ SETUP ══ -->
+<section id="setup">
+  <div class="container">
+    <div class="sec-label">// 05 — LAUNCH</div>
+    <h2 class="sec-title">What's needed to set it up</h2>
+    <p class="sec-sub">Five steps from zero to a fully working booking system.</p>
+
+    <div class="setup-list">
+      <div class="setup-item">
+        <div class="setup-n" style="background:rgba(245,158,11,.15); color:var(--gold);">1</div>
+        <div class="setup-text"><b>Airtable — database setup</b>Create the "Villa Marea" base → the RESERVATIONS table with all the fields (guest_name, phone, table_id, zone, date, time_slot, guests_count, status, pre_order, notes). Add an Airtable Personal Access Token to the n8n credentials. The database is the single source of truth for the whole system.</div>
+      </div>
+      <div class="setup-item">
+        <div class="setup-n" style="background:rgba(79,142,247,.15); color:var(--accent);">2</div>
+        <div class="setup-text"><b>n8n — importing and configuring the workflow</b>Import the system's JSON file into n8n → connect the credentials: Airtable API, Telegram Bot Token, Claude API key. Activate the Webhook trigger — it accepts requests from ElevenLabs and the website. Verify that all 4 workflow branches (site, agent, cancel, pre-order) are active.</div>
+      </div>
+      <div class="setup-item">
+        <div class="setup-n" style="background:rgba(16,185,129,.15); color:var(--green);">3</div>
+        <div class="setup-text"><b>ElevenLabs — voice agent on the website</b>Create a Conversational AI agent in ElevenLabs → connect it to the n8n Webhook as the endpoint for the transcript. Embed the JS widget on the Base44 website. Configure the voice, language (Ukrainian) and the agent's system prompt with information about the restaurant and the menu.</div>
+      </div>
+      <div class="setup-item">
+        <div class="setup-n" style="background:rgba(167,139,250,.15); color:#a78bfa;">4</div>
+        <div class="setup-text"><b>Base44 — restaurant website and manager dashboard</b>Two separate projects in Base44: the public Villa Marea website (with an integrated chat widget and booking form) and the private manager dashboard (floor plan + reservation list). Both are connected to Airtable via the API and update in real time.</div>
+      </div>
+      <div class="setup-item">
+        <div class="setup-n" style="background:rgba(45,212,191,.15); color:var(--teal);">5</div>
+        <div class="setup-text"><b>Testing and handover</b>A test run of each scenario: a new reservation through the website, a voice booking, a cancellation, a pre-order. Verify that records appear in Airtable, the manager receives Telegram notifications and the dashboard shows up-to-date data. After testing — hand over the access credentials to the client.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ RESULTS ══ -->
+<section id="results">
+  <div class="container">
+    <div class="sec-label">// 06 — RESULT</div>
+    <h2 class="sec-title">What changes after launch</h2>
+    <p class="sec-sub">The system takes over the routine — and gives the administrator back time for live work with guests in the hall.</p>
+    <div class="results-grid">
+      <div class="res-card rc-gold">
+        <div class="res-num">24/7</div>
+        <div class="res-desc">Reservations are taken around the clock — no days off, no sick leave, no missed calls at 11 PM.</div>
+      </div>
+      <div class="res-card rc-green">
+        <div class="res-num">&lt;2 min</div>
+        <div class="res-desc">From the first message to a confirmed reservation with details and a table number.</div>
+      </div>
+      <div class="res-card rc-blue">
+        <div class="res-num">−3 hrs</div>
+        <div class="res-desc">The administrator saves up to 3 hours a day — which used to go into handling calls and bookings by hand.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STACK ══ -->
+<section id="stack">
+  <div class="container">
+    <div class="sec-label">// 07 — STACK</div>
+    <h2 class="sec-title">Technology under the hood</h2>
+    <p class="sec-sub">Each tool plays a clear role. Together they form a system that needs no human involvement in the routine.</p>
+    <div class="stack-grid">
+      <div class="stack-card">
+        <div class="stack-icon">⚙️</div>
+        <div class="stack-name">n8n</div>
+        <div class="stack-role">Orchestration</div>
+        <div class="stack-desc">The heart of the system — 61 nodes, 4 workflow branches. Takes requests, runs the logic, connects all the services.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">🤖</div>
+        <div class="stack-name">Claude API</div>
+        <div class="stack-role">AI agent</div>
+        <div class="stack-desc">Holds a natural conversation, recognizes intent, knows the full menu, maintains the conversation context.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">🗄️</div>
+        <div class="stack-name">Airtable</div>
+        <div class="stack-role">Database</div>
+        <div class="stack-desc">The single store of all reservations. The RESERVATIONS table is the source of truth for the system and the dashboard.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">🎙️</div>
+        <div class="stack-name">ElevenLabs</div>
+        <div class="stack-role">Voice agent</div>
+        <div class="stack-desc">Conversational AI on the website — a lifelike voice, natural dialogue, transcript into n8n via Webhook.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">🌐</div>
+        <div class="stack-name">Base44</div>
+        <div class="stack-role">Frontend</div>
+        <div class="stack-desc">Two sites: the public restaurant website with the chat and the private manager dashboard with the floor plan.</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-icon">✈️</div>
+        <div class="stack-name">Telegram Bot API</div>
+        <div class="stack-role">Notifications</div>
+        <div class="stack-desc">Instant Telegram messages to the manager on every new reservation or cancellation.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-logo">// VILLA MAREA — BOOKING SYSTEM</div>
+  <div class="footer-tags">
+    <span class="footer-tag">n8n</span>
+    <span class="footer-tag">Claude API</span>
+    <span class="footer-tag">Airtable</span>
+    <span class="footer-tag">ElevenLabs</span>
+    <span class="footer-tag">Base44</span>
+    <span class="footer-tag">Telegram</span>
+  </div>
+  <div class="footer-meta">Documentation v1.0 · 2025</div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.07 });
+
+  document.querySelectorAll('.ov-card, .arch-card, .schema-card, .setup-item, .res-card, .stack-card').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.55s ease, transform 0.55s ease, border-color 0.25s, box-shadow 0.25s';
+    observer.observe(el);
+  });
+</script>
+
+</body>
+</html>
